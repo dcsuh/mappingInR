@@ -1,10 +1,10 @@
-### Welcome
+## Welcome
 
 See below for all workshop materials:
 
 [https://dcsuh.github.io/mappingInR/section_A]
 
-## About the workshop materials:
+### About the workshop materials:
 
 All of the materials provided in this workshop are adapted from this free online textbook: [https://geocompr.robinlovelace.net/]
 
