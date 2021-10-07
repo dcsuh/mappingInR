@@ -6,7 +6,7 @@ See below for all workshop materials:
 
 You can view these as the knitted html versions or you can use the download link to download the original .Rmd files.
 
-[Section A](https://dcsuh.github.io/mappingInR/section_A){:target="_blank"} [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_A.Rmd)
+[Section A](https://dcsuh.github.io/mappingInR/section_A){:target="_blank"} <div style="text-align: right"> [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_A.Rmd) </div>
 
 ### About the workshop materials:
 
