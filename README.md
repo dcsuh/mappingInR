@@ -7,7 +7,7 @@ This page is used to host the materials for the [CEID's Disease Mapping Working 
 You can view these as the knitted html versions or you can use the download link to download the original .Rmd files.
 
 * Day 1
-  * [Section A](https://dcsuh.github.io/mappingInR/section_A){:target="_blank"} 
+  * [Section A](https://dcsuh.github.io/mappingInR/section_A)  
       * [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_A.Rmd)
       
 * Day 2
