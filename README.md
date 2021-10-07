@@ -8,7 +8,7 @@ You can view these as the knitted html versions or you can use the download link
 
 * Day 1
   * [Section A](https://dcsuh.github.io/mappingInR/section_A){:target="_blank"} 
-      *[(download .Rmd)](https://dcsuh.github.io/mappingInR/section_A.Rmd)
+      * [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_A.Rmd)
       
 * Day 2
 
