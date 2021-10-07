@@ -13,11 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Geographic data can be broken down into two fundamental data models: **vector** data and **raster** data. It is vital to understand the differences between vector and raster data because we handle them in different ways.
 
-## Vector Data
+### Vector Data
 
 Vector data consist of point, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent meaningful and tangible structures such as a bus stop (point), a road (line), or a county (polygon). When you think about maps 
 
 [add example of points, lines, and polygons]
 
 
-## Raster Data
+### Raster Data
