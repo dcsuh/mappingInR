@@ -1,5 +1,7 @@
 ## Welcome
 
+This page is used to host the materials for the [CEID's](ceid.uga.edu){:target="_blank"} [Disease Mapping Working Group's](https://www.ceid.uga.edu/2016/06/18/disease-mapping-working-group/){:target="_blank"} 'Mapping in R' weekend workshop materials. 
+
 See below for all workshop materials:
 
 [Section A](https://dcsuh.github.io/mappingInR/section_A){:target="_blank"} [(download)](https://dcsuh.github.io/mappingInR/section_A.Rmd)
