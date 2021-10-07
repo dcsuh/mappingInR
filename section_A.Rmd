@@ -1,28 +1,23 @@
 ---
 title: "Section_A"
+subtitle: "[Home](dcsuh.github.io/mappingInR)"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r global options, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# Data types
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Geographic data can be broken down into two fundamental data models: **vector** data and **raster** data. It is vital to understand the differences between vector and raster data because we handle them in different ways.
 
-```{r cars}
-summary(cars)
-```
+## Vector Data
 
-## Including Plots
+Vector data consist of point, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent meaningful and tangible structures such as a bus stop (point), a road (line), or a county (polygon). When you think about maps 
 
-You can also embed plots, for example:
+[add example of points, lines, and polygons]
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Raster Data
