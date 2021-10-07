@@ -1,6 +1,6 @@
 ---
 title: "Section_A"
-subtitle: "[Back to Home](dcsuh.github.io/mappingInR)"
+subtitle: "[Back to Home](dcsuh.github.io/mappingInR/)"
 output: html_document
 ---
 
