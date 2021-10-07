@@ -15,9 +15,26 @@ Geographic data can be broken down into two fundamental data models: **vector** 
 
 ### Vector Data
 
-Vector data consist of point, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent meaningful and tangible structures such as a bus stop (point), a road (line), or a county (polygon). When you think about maps 
+Vector data consist of point, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent meaningful and tangible structures such as a bus stop (point), a road (line), or a county (polygon). The types of maps that we regularly use in our lives are often visualizations of vector data.
 
 [add example of points, lines, and polygons]
 
 
 ### Raster Data
+
+Raster data can be thought of as a grid of cells. These cells are analogous to the pixels that make up an image and are consequently often referred to as pixels. Raster data are commonly used to represent continuous data over a spatial area such as elevation or temperature. 
+
+
+## Packages
+
+### Packages for vector data
+
+### Packages for raster data
+
+
+## Coordinate Reference Systems
+
+Before we move any further, it is also vital that you understand Coordinate Reference Systems (CRS). Broadly speaking, coordinate reference systems define how the spatial elements of the data relate to the surface of Earth (or any other celestial body you may be studying).
+
+CRS's can be either geographic or projected. Most of us are already familiar with the conventions of a geographic CRS. Any geographic CRS uses longitude and latitude to describe any location on the Earth's surface. However, not all geographic CRS's are made alike and each must make different assumptions about the Earth's surface. 
+
