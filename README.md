@@ -1,6 +1,6 @@
 # Welcome
 
-This page is used to host the materials for the [CEID's Disease Mapping Working Group's](https://www.ceid.uga.edu/2016/06/18/disease-mapping-working-group/){:target="_blank"} _Mapping in R_ weekend workshop materials. 
+This page is used to host the materials for the [CEID's Disease Mapping Working Group's](https://www.ceid.uga.edu/2016/06/18/disease-mapping-working-group/){:target="_blank"} **"Mapping in R"** weekend workshop materials. 
 
 See below for all workshop materials:
 
