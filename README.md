@@ -2,7 +2,7 @@
 
 See below for all workshop materials:
 
-link
+[https://dcsuh.github.io/mappingInR/section_A]
 
 ## About the workshop materials:
 
