@@ -1,0 +1,10 @@
+---
+title: "section_B"
+author: "Daniel Suh"
+date: "10/29/2021"
+output: html_document
+---
+```{r global options, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
