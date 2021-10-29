@@ -38,3 +38,78 @@ Before we move any further, it is also vital that you understand Coordinate Refe
 
 CRS's can be either geographic or projected. Most of us are already familiar with the conventions of a geographic CRS. Any geographic CRS uses longitude and latitude to describe any location on the Earth's surface. However, not all geographic CRS's are made alike and each must make different assumptions about the Earth's surface. 
 
+
+
+### Exercises
+
+```{r}
+library(sf)
+library(terra)
+library(spData)
+library(spDataLarge)
+```
+
+
+E1. Use summary() on the geometry column of the world data object. What does the output tell us about:
+
+```{r}
+summary(world$geom)
+```
+
+
+Its geometry type? multipolygon
+The number of countries? 177
+Its coordinate reference system (CRS)? epsg:4326
+
+
+E2. Run the code that ‘generated’ the map of the world in Section 2.2.4 Base plot arguments. Find two similarities and two differences between the image on your computer and that in the book.
+
+```{r}
+plot(world["continent"], reset = FALSE)
+cex = sqrt(world$pop) / 10000
+world_cents = st_centroid(world, of_largest = TRUE)
+plot(st_geometry(world_cents), add = TRUE, cex = cex)
+```
+Similarities: colors and circle sizes
+Differences: no gridlines and projection looks different
+
+What does the cex argument do (see ?plot)? cex is a scaling factor for characters and symbols
+Why was cex set to the sqrt(world$pop) / 10000? This was to standardize population size
+Bonus: experiment with different ways to visualize the global population.
+```{r}
+plot(world["continent"], reset = FALSE)
+cex = sqrt(world$pop) / 10000
+world_cents = st_centroid(world, of_largest = TRUE)
+plot(st_geometry(world_cents), add = TRUE, cex = cex)
+```
+
+
+
+E3. Use plot() to create maps of Nigeria in context (see Section 2.2.4 Base plot arguments).
+Adjust the lwd, col and expandBB arguments of plot().
+Challenge: read the documentation of text() and annotate the map.
+```{r}
+Nigeria <- world[world$name_long == "Nigeria", ]
+plot(st_geometry(Nigeria), reset = FALSE, lwd = 10, col = "blue", expandBB = c(0.5,0,0,0))
+text(10, labels = "hello")
+```
+
+
+
+E4. Create an empty SpatRaster object called my_raster with 10 columns and 10 rows. Assign random values between 0 and 10 to the new raster and plot it.
+```{r}
+my_raster <- rast(nrows = 10, ncols = 10, resolution = 0.5, 
+                  xmin = -1.5, xmax = 1.5, ymin = -1.5, ymax = 1.5,
+                  vals = 0:10)
+plot(my_raster)
+```
+
+
+
+E5. Read-in the raster/nlcd.tif file from the spDataLarge package. What kind of information can you get about the properties of this file?
+```{r}
+nlcd <- rast(system.file("raster/nlcd2011.tif", package = "spDataLarge"))
+nlcd
+plot(nlcd)
+```
+
