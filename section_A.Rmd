@@ -17,8 +17,6 @@ Geographic data can be broken down into two fundamental data models: **vector** 
 
 Vector data consist of point, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent meaningful and tangible structures such as a bus stop (point), a road (line), or a county (polygon). The types of maps that we regularly use in our lives are often visualizations of vector data.
 
-[add example of points, lines, and polygons]
-
 
 ### Raster Data
 
@@ -27,9 +25,7 @@ Raster data can be thought of as a grid of cells. These cells are analogous to t
 
 ## Packages
 
-### Packages for vector data
-
-### Packages for raster data
+There are a variety of packages for working with spatial data and these have improved over the years. The most up-to-date packages and the ones we will be focusing on for this workshop are 'sf' for vector data and 'terra' for raster data. In addition, we will be using some packages that will load in datasets for our exercises. These are 'spData' and 'spDataLarge'.
 
 
 ## Coordinate Reference Systems
@@ -38,6 +34,86 @@ Before we move any further, it is also vital that you understand Coordinate Refe
 
 CRS's can be either geographic or projected. Most of us are already familiar with the conventions of a geographic CRS. Any geographic CRS uses longitude and latitude to describe any location on the Earth's surface. However, not all geographic CRS's are made alike and each must make different assumptions about the Earth's surface. 
 
+
+## Vector Data and simple features
+
+'sf' stands for simple features which is an open standard for working with vector geometry data. Simple features can support all common vector geometry types such as points, lines, polygons and the 'multi' versions of each of these. Geometry collections are also supported which can include multiple data types in one object.
+
+Let's start by looking at the 'world' dataset from the 'spData' package.
+
+```{r}
+class(world)
+names(world)
+```
+
+Note that world is an object of class "sf" and that the data include a column for "geom". "sf" can be simply understood as a regular data frame with an added geom column containing all the geometry data you will need. This column might not always be called "geom" but it will usually have a similar name such as "geometry".
+
+Let's use 'plot' from the 'sf' package to quickly visualize the data from 'world'
+```{r}
+plot(world)
+```
+cool map!
+
+## A note on simple features and the 'sf' package.
+
+'sf' is not the first package that has been primarily used for working with spatial data in R. 'sp' is a package with similar functionality but is being superseded by 'sf'. Because 'sf' is newer you might find that some packages don't currently support 'sf' objects but will support 'sp' objects. However, many packages are beginning to adapt to 'sf' and there are already a number of mapping packages that are set up for an 'sf' workflow. We'll focus on those packages later on in the workshop.
+
+Take some time now to play around with plot() and the 'world' data. You should find that it is already pretty intuitive to use to make some simple maps. Run this example code and then describe how the second map is different than the first and how this is designated in the code. After that, spend some time to make a different map of your own and show it to somebody.
+
+```{r}
+plot(world["pop"])
+
+world_asia <- world[world$continent == "Asia", ]
+asia <- st_union(world_asia)
+
+plot(world["pop"], reset = FALSE)
+plot(asia, add = TRUE, col = "red")
+```
+
+## Geometry types
+
+Geometries are the basic building blocks of simple features. Simple features in R can take on one of the 17 geometry types supported by the 'sf' package. We will be focusing on the most common types: points, linestring, polygon, multipoint, multilinestring, multipolygon, and geometrycollection.
+
+Geometry types will be encoded using either a hexadecimal code known as well-known binary (WKB) or a human-readable string known as well-known text (WKT).
+
+add examples here for the different geometry types???
+
+
+## Simple feature geometries
+
+Simple feature geometries will be represented by class 'sfg' and these are the geometries that will be in the 'geom' column of an 'sf' object. You usually won't have to worry about creating 'sfg' objects on your own since they will be provided by a file that includes all the spatial data. However, it is still important to understand the basics of 'sfg'. A more detailed description can be found in the online textbook. 
+
+'sfg' objects will be made from one of three base R data types:
+1. A numeric vector: a single point
+2. A matrix: a set of points, where each row represents a point, a multipoint or linestring
+3. A list: a collection of objects such as matrices, multilinestrings or geometry collections
+
+## Simple feature columns
+
+One sfg object contains only a single simple feature geometry. A simple feature geometry column 'sfc' is a list of sfg objects, which is additionally able to contain information about the coordinate reference system in use. 'sfc' represents the geometry column in 'sf' data frames. 'sfc' can contain multiple simple feature geometries and these will usually be of the same type but they do not have to be. However, it is important that all the geometries are of the same CRS since 'sfc' can contain information about the CRS. 
+
+add example here for checking the CRS and making sure it is the same? This seems like a point where people might get somewhat lost.
+
+
+## 'sf' class
+simple feature geometries and simple feature geometry columns make up all of the important spatial information that we want. Usually, though, we also want to associate these data with non-spatial data known as attributes. Objects of class 'sf' accomplish these by combining attribute data with 'sfc' objects. This results in 'sf' objects which can be treated like regular data frames with an added column for spatial data. When working with vector data, most of your analysis will likely be based off of the final 'sf' objects.
+
+add example here for actually making an sf object by combining a regular data fram and an sfc?
+
+
+## Raster data
+
+
+
+
+### Glossary?
+vector
+raster
+CRS
+geometry type
+'sf' object
+'sfg' object
+online textbook
 
 
 ### Exercises
