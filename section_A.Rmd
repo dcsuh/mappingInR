@@ -9,6 +9,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+```{r}
+library(sf)
+library(terra)
+library(spData)
+library(spDataLarge)
+```
+
+
 # Data types
 
 Geographic data can be broken down into two fundamental data models: **vector** data and **raster** data. It is vital to understand the differences between vector and raster data because we handle them in different ways.
@@ -33,6 +41,12 @@ There are a variety of packages for working with spatial data and these have imp
 Before we move any further, it is also vital that you understand Coordinate Reference Systems (CRS). Broadly speaking, coordinate reference systems define how the spatial elements of the data relate to the surface of Earth (or any other celestial body you may be studying).
 
 CRS's can be either geographic or projected. Most of us are already familiar with the conventions of a geographic CRS. Any geographic CRS uses longitude and latitude to describe any location on the Earth's surface. However, not all geographic CRS's are made alike and each must make different assumptions about the Earth's surface. 
+
+The most important thing to understand about CRS's is that these should be consistent throughout your analysis. Unfortunately, there is no universal standard for CRS because each CRS has its own advantages and disadvantages. Identification of CRS's can also differ but we recommend using either Spatial Reference System Identifier (SRID) or well-known-text (WKT2). For the purposes of the exercises in this workshop, we will make sure that CRS's are appropriately used, but this is something you will need to manage in your own projects, especially when gather data from different sources. For more in depth knowledge on how to identify and change CRS's please see section 2.4 of the online textbook.
+
+## Units
+
+Another aspect of working with spatial data that needs to be consistent are units. Attribute data and CRS's can all be using different units which will be problematic for analysis. Again, we will ensure that units are appropriate during this workshop, but you will have to monitor this closely in your own work. Additional information on the subject can be found in section 2.5 of the online textbook.
 
 
 ## Vector Data and simple features
@@ -98,12 +112,45 @@ add example here for checking the CRS and making sure it is the same? This seems
 ## 'sf' class
 simple feature geometries and simple feature geometry columns make up all of the important spatial information that we want. Usually, though, we also want to associate these data with non-spatial data known as attributes. Objects of class 'sf' accomplish these by combining attribute data with 'sfc' objects. This results in 'sf' objects which can be treated like regular data frames with an added column for spatial data. When working with vector data, most of your analysis will likely be based off of the final 'sf' objects.
 
-add example here for actually making an sf object by combining a regular data fram and an sfc?
+add example here for actually making an sf object by combining a regular data frame and an sfc?
 
 
-## Raster data
+## Raster data and 'terra'
+
+The 'terra' package provides an extensive set of functions to create, read, export, manipulate and process raster datasets. 'terra' is useful because it includes many basic functions as well as advanced functions for working with raster data. 'spDataLarge' includes raster datasets that we can use to learn some of these functions.
+
+Read in this raster with this code chunk.
+```{r}
+raster_filepath = system.file("raster/srtm.tif", package = "spDataLarge")
+my_rast = rast(raster_filepath)
+```
+
+Type the name of the raster you just made into the console and answer the following questions.
+
+What is the class of the object?
+What are the dimensions?
+What CRS is being used?
+
+All raster objects will include a header that includes all of this information in addition to the actual data being stored.
+
+Similar to 'sf', terra also has a basic function for plotting which is also called 'plot'. Plot the raster object below.
+
+```{r}
+
+```
 
 
+## Raster Classes
+
+The 'SpatRaster' class is what we will be using to represent raster objects. You will usually be reading raster files in from online servers, but you can also make these manually on your own. Below is an example of some code that will make a raster object of class 'SpatRaster'
+
+```{r}
+new_raster = rast(nrows = 6, ncols = 6, resolution = 0.5, 
+                  xmin = -1.5, xmax = 1.5, ymin = -1.5, ymax = 1.5,
+                  vals = 1:36)
+```
+
+'SpatRaster's can also handle rasters with multiple layers and those layers can be subsetted using terra:subset() and combined using c().
 
 
 ### Glossary?
@@ -117,13 +164,6 @@ online textbook
 
 
 ### Exercises
-
-```{r}
-library(sf)
-library(terra)
-library(spData)
-library(spDataLarge)
-```
 
 
 E1. Use summary() on the geometry column of the world data object. What does the output tell us about:
