@@ -23,6 +23,16 @@ Spatial objects can be described using their location and shape and these charac
 
 ## Spatial subsetting
 
+Spatial subsetting is the process of selecting features of a spatial object based on whether or not they in some way relate in space to another object. It is analogous to attribute subsetting and can be done with the base R operator [] or with the 'dplyr' filter() function. The 'nz' and 'nz_height' datasets can be used to demonstrate this.
+
+```{r}
+canterbury = nz %>% filter(Name == "Canterbury")
+canterbury_height = nz_height[canterbury, ]
+```
+
+
+
+
 
 
 E1. It was established in Section 4.2 that Canterbury was the region of New Zealand containing most of the 100 highest points in the country. How many of these high points does the Canterbury region contain?
