@@ -9,6 +9,10 @@ You can view these as the knitted html versions or you can use the download link
 * Day 1
   * [Section A](https://dcsuh.github.io/mappingInR/section_A)  
       * [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_A.Rmd)
+  * [Section B](https://dcsuh.github.io/mappingInR/section_B)  
+      * [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_B.Rmd)
+  * [Section C](https://dcsuh.github.io/mappingInR/section_C)  
+      * [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_C.Rmd)
       
 * Day 2
 

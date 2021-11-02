@@ -16,6 +16,131 @@ library(spData)
 library(magrittr)
 ```
 
+## Attribute Data Operations
+
+Attribute data is non-spatial information associated with geographic (geometry) data. Understanding how to manipulate attribute data in vector and raster datasets is important because you will likely be performing operations on these data throughout your analysis. Fortunately, in 'sf' objects these operations are analagous to working with data frames. For raster objects, each cell contains a single attribute value so it is important that each raster layer is consistently defined.
+
+
+## Vector Attribute Manipulation
+
+The most significant difference between data frames and 'sf' objects is that 'sf' objects include the 'geometry' column. A useful feature of this column is that it is "sticky" and will remain appended to the attribute data unless explicitly removed. For example, read in the 'world' dataset and select out a single column.
+
+```{r}
+summary(world)
+
+```
+NOTE: It is useful to index to the package specifically when using certain functions like select(). This is especially true when working with 'sf' and 'terra' which share a number of function names.
+
+Notice how the 'geom' column remains even without being explicitly selected for.
+
+If you really need to remove the 'geometry' column from an 'sf' object then you can use the conveniently named st_drop_geometry() function. Removing the 'geometry' column can be useful because operations on the attribute data alone can sometimes be faster. However, it is usually helpful to keep the 'geometry' column included and there shouldn't be any instances during this workshop when you'll need to drop it.
+
+
+## Vector Attribute Subsetting
+
+Vector attribute subsetting can be accomplished using the base R operators such as [] and subset() or the dplyr functions filter(), slice(), or select().
+
+Base R and dplyr functions both work well for subsetting 'sf' objects while maintaining them as 'sf' objects. However, if you use operators such as $ or [[]] or the dplyr function pull() then you should expect to receive vectors rather than 'sf' objects. Vectors, by definition, will only store information from a single column which means you will lose the 'geometry' column.
+
+## Vector Attribute Aggregation
+
+A common part of a data analysis workflow is to group and summarize data according to grouping variables (i.e. aggregation). The 'tidy' method of programming in R provides an excellent workflow and we recommend using the pipe operator (%>%) as well. Pipes are efficient and easier to read than the base R equivalent of subsetted functions. 
+
+Here is an example of a pipe that will group the 'world' dataset by 'continent' and then calculate the total population
+
+```{r}
+world_cont_pop <- world %>% 
+  group_by(continent) %>%
+  summarize(pop = sum(pop, na.rm=T))
+world_cont_pop
+```
+Let's try to write a pipe that only includes Asia, Europe, and Africa and summarize each continent by total area.
+
+```{r}
+
+```
+
+Here is another slightly more invovled example. If you have time, then add a comment to each line to describe what it does.
+```{r}
+world_agg <- world %>% 
+  st_drop_geometry() %>%                      
+  dplyr::select(pop, continent, area_km2) %>% 
+  group_by(continent) %>%                     
+  summarize(Pop = sum(pop, na.rm = TRUE), Area = sum(area_km2), N = n()) %>%
+  mutate(Density = round(Pop / Area)) %>%     
+  top_n(n = 3, wt = Pop) %>%                   
+  arrange(desc(N))                            
+```
+
+
+## Vector Attribute Joining
+
+Another common part of a data analysis workflow will be joining different datasets. 'dplyr' provides us with a number of useful functions for this such as left_join(), inner_join(), and full_join() and these same functions work with 'sf' objects as well.
+
+'spData' includes another dataset called 'coffee_data'. Try to join 'world' and 'coffee_data' using one of the dplyr join functions.
+
+```{r}
+
+```
+
+Did it work? Note that joins will only work if there is a common column name between the two objects being joined.
+
+If you use left_join() then it is also important to note that the result of this function will usually match the formatting of the first argument. (i.e. left_join(world, coffee_data) will return an 'sf' object because 'world' was an 'sf' object but left_join(coffee_data, world) will return a data frame)
+
+## Creating Attributes
+
+Another important part of your workflow might include creating new columns based off of data from exisiting columns. The 'dplyr' functions mutate() and transmute() will aid you in accomplishing this. 
+
+Describe what this code chunk does and then add another column that log transforms the population
+```{r}
+world %>% 
+  mutate(pop_dens = pop / area_km2)
+```
+
+
+## Manipulating Raster Objects
+
+Raster objects can not be manipulated like vector objects since these represent continuous surfaces rather than geometric objects (points, lines, and polygons). For raster objects, we will primarily use the [] operators for subsetting. First, we can create a couple raster object that we can work with.
+
+This chunk creates a 6x6 raster that will represent elevation (continuous data).
+```{r}
+elev = rast(nrows = 6, ncols = 6, resolution = 0.5, 
+            xmin = -1.5, xmax = 1.5, ymin = -1.5, ymax = 1.5,
+            vals = 1:36)
+```
+
+This chunk creates another 6x6 raster that represents grain sizes (categorical data).
+```{r}
+grain_order = c("clay", "silt", "sand")
+grain_char = sample(grain_order, 36, replace = TRUE)
+grain_fact = factor(grain_char, levels = grain_order)
+grain = rast(nrows = 6, ncols = 6, resolution = 0.5, 
+             xmin = -1.5, xmax = 1.5, ymin = -1.5, ymax = 1.5,
+             vals = grain_fact)
+```
+
+Cell values can be obtained and overwritten using the [] operators.
+```{r}
+elev[1,1]
+elev[1,1] <- 0
+elev[1,1]
+```
+
+c() can be used to combine layers to make a multi-layer raster
+```{r}
+multi <- c(elev,grain)
+```
+
+## Summarizing raster objects
+
+'terra' includes helpful functions to gather descriptive statistics from raster objects. A few of these include some familiar functions such as boxplot(), hist(), and summary()
+
+Try a few of these out and compare with your neighbor. ('grain' had cells that were randomly assigned so you should expect different answers)
+```{r}
+
+```
+
+
 For these exercises we will use the us_states and us_states_df datasets from the spData package:
 
 us_states is a spatial object (of class sf), containing geometry and a few attributes (including name, region, area, and population) of states within the contiguous United States. us_states_df is a data frame (of class data.frame) containing the name and additional variables (including median income and poverty level, for the years 2010 and 2015) of US states, including Alaska, Hawaii and Puerto Rico. The data comes from the United States Census Bureau, and is documented in ?us_states and ?us_states_df.
