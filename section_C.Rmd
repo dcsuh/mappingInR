@@ -16,6 +16,11 @@ library(spData)
 library(magrittr)
 ```
 
+```{r}
+elev = rast(system.file("raster/elev.tif", package = "spData"))
+grain = rast(system.file("raster/grain.tif", package = "spData"))
+```
+
 
 ## Spatial Data Operations
 
