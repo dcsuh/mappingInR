@@ -17,7 +17,11 @@ library(magrittr)
 ```
 
 
+## Spatial Data Operations
 
+Spatial objects can be described using their location and shape and these characteristics are used for most spatial data operations. In the case of vector data, many of these operations are analogous to their attribute data counterpart. Subsetting, joining, and aggregation use similar functions but there are additional decisions to be made when dealing with vector data. For example, if you want to know if a point lies inside a polygon then you will need to decide if a point that intersects with the border of that polygon still counts and if you want to include any points that are close to being inside the polygon. For raster data we can subset cells in similar ways to attribute data and we will also learn about map algebra and the different classes of raster operations: local, focal, zonal, and global.
+
+## Spatial subsetting
 
 
 
