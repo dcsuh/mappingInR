@@ -24,16 +24,28 @@ grain = rast(system.file("raster/grain.tif", package = "spData"))
 
 ## Spatial Data Operations
 
-Spatial objects can be described using their location and shape and these characteristics are used for most spatial data operations. In the case of vector data, many of these operations are analogous to their attribute data counterpart. Subsetting, joining, and aggregation use similar functions but there are additional decisions to be made when dealing with vector data. For example, if you want to know if a point lies inside a polygon then you will need to decide if a point that intersects with the border of that polygon still counts and if you want to include any points that are close to being inside the polygon. For raster data we can subset cells in similar ways to attribute data and we will also learn about map algebra and the different classes of raster operations: local, focal, zonal, and global.
+Spatial objects are primarily described using their location and shape and these characteristics are used for most spatial data operations. In the case of vector data, many of these operations are analogous to their attribute data counterpart. Subsetting, joining, and aggregation use similar functions but there are additional decisions to be made when dealing with vector data. For example, if you want to know if a point lies inside a polygon then you will need to decide if a point that intersects with the border of that polygon still counts and if you want to include any points that are close to being inside the polygon. For raster spatial data, we will build off of what we learned for raster attribute data and add map algebra and the different classes of raster operations: local, focal, zonal, and global.
 
 ## Spatial subsetting
 
 Spatial subsetting is the process of selecting features of a spatial object based on whether or not they in some way relate in space to another object. It is analogous to attribute subsetting and can be done with the base R operator [] or with the 'dplyr' filter() function. The 'nz' and 'nz_height' datasets can be used to demonstrate this.
 
 ```{r}
-canterbury = nz %>% filter(Name == "Canterbury")
-canterbury_height = nz_height[canterbury, ]
+canterbury <- nz %>% filter(Name == "Canterbury")
+canterbury_height <- nz_height[canterbury, ]
 ```
+Describe what these two lines of code do and what canterbury_height represents.
+
+
+Using the [] operator, we can understand subsetting as x[y,] where 'x' is a target which is subsetted using the contents of a source object 'y'. In attribute subsetting, y is often a condition that will be logically evaluated (e.g. data[1:6,] means IF value is of row 1:6 then TRUE, else is FALSE). In subsetting 'sf' objects, y can be another 'sf' object. In this scenario the condition is whether the 'y' 'sf' object has a relationship with the 'x' 'sf' object. The types of topological relationships that we usually use for subsetting are 'intersects', 'touches', 'crosses', and 'within' ('intersects' is the most comprehensive of these and includes 'touches', 'crosses', and 'within'). These are functions from the 'sf' package that can be passed to the [] operator using the 'op =' argument.
+
+For example, st_disjoint() is a function that acts as the opposite of st_intersects() and includes all the of the target (nz_height) that exists outside the source (canterbury).
+```{r}
+canterbury_height1 <- nz_height[canterbury, ,op = st_intersects] #compare this object to the other canterbury_height and see if there is any difference
+canterbury_height_within <- nz_height[canterbury, ,op = st_disjoint]
+```
+
+There are other methods for subsetting and if you are interested then you can read the rest of section 4.2.1 in the online textbook.
 
 
 
