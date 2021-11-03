@@ -48,6 +48,46 @@ canterbury_height_within <- nz_height[canterbury, ,op = st_disjoint]
 There are other methods for subsetting and if you are interested then you can read the rest of section 4.2.1 in the online textbook.
 
 
+## Topological Relations
+
+Topological relations describe the spatial relationships between objects. To demonstrate these topics, we'll use some made up data.
+
+```{r}
+# create a polygon
+a_poly <- st_polygon(list(rbind(c(-1, -1), c(1, -1), c(1, 1), c(-1, -1))))
+a <- st_sfc(a_poly)
+# create a line
+l_line <- st_linestring(x = matrix(c(-1, -1, -0.5, 1), ncol = 2))
+l <- st_sfc(l_line)
+# create points
+p_matrix <- matrix(c(0.5, 1, -1, 0, 0, 1, 0.5, 1), ncol = 2)
+p_multi <- st_multipoint(x = p_matrix)
+p <- st_cast(st_sfc(p_multi), "POINT")
+
+plot(c(a,l,p))
+```
+There are a number of questions we can ask about these geometries. Which points intersect with the line? Which points lie within the polygon? Which points are neither intersecting or within any other geometries? The 'sf' functions provide simple verbs to help us bridge our questions to code.
+
+We've answered the first question below. Add a couple lines of code to answer the other questions
+```{r}
+st_intersects(p, l)
+```
+
+You can check section 4.2.2 in the online textbook for more details but if you want the output to be stored as a single vector then your syntax should match what we show below.
+
+```{r}
+st_intersects(p, l, sparse = FALSE)[, 1]
+```
+
+One additional topological relation that we will discuss is when features are not intersecting but are close. st_is_within_distance() can be used to accomplish this.
+
+```{r}
+sel <- st_is_within_distance(p, a, dist = 0.9) # can only return a sparse matrix
+lengths(sel) > 0
+#> [1]  TRUE  TRUE FALSE  TRUE
+```
+
+## Spatial joining
 
 
 
