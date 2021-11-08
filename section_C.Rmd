@@ -89,6 +89,58 @@ lengths(sel) > 0
 
 ## Spatial joining
 
+Joining two non-spatial datasets relies on a shared variable. Spatial data joining applies the same concept, but instead relies on shared areas of geographic space (it is also known as spatial overlay). As with attribute data, joining adds a new column to the target object (the argument x in joining functions), from a source object (y).
+
+By default, st_join() performs a left join, but it can also do inner joins by setting the argument left = FALSE. Like spatial subsetting, the default topological operator used by st_join() is st_intersects(). This can be changed with the join argument (see ?st_join for details). 
+
+ADD EXAMPLE
+
+
+## Non-overlapping joins
+
+Sometimes geographic datasets may not actually touch but may be related to each other. In this case, you may want to join these datasets which can be accomplished using st_join() with st_is_within_distance() passed in as an argument.
+
+ADD EXAMPLE
+
+## Spatial data aggregation
+
+Aggregation with vector data functions similarly to non-spatial data. Both aggregate() or the 'tidy' functions group_by() and summarize() can be used.
+
+These both do the same thing.
+```{r}
+nz_avheight = aggregate(x = nz_height, by = nz, FUN = mean)
+
+nz_avheight2 = nz %>%
+  st_join(nz_height) %>%
+  group_by(Name) %>%
+  summarize(elevation = mean(elevation, na.rm = TRUE))
+```
+
+In spatial data aggregation it is important to consider spatial congruence. Spatial objects are congruent when the borders line up properly but are incongruent otherwise. Congruent boundaries are usually those defined by geopolitical borders such as state and county lines. Other borders such as those described by natural boundaries may be incongruent if your original spatial objects were defined by state or county borders. In the case of incongruent borders, it is important to decide how to interpolate the data. One method is area weighted spatial interpolation. In this method the incongruent object will aggregate according to the proportion of the area. For example, if you had a polygon for a county and another polgyon for a feature such as farmland then the farmland polygon will probably incongruent with the boundary of the county. If there are attribute data available for the county such as rainfall per year then you may want to know how much rainfall per year the farmland is getting. If we pretend that the county gets 1000 mm per year of rainfall and the farmland makes up 3/4 of the county by area then we area weighted spatial interpolation would calculate the rainfall for the farmland as 750 mm per year since the area it cover is 3/4 of the entire county.
+
+st_interpolate_aw() is one function allowing for area weighted interpolation. However, depending on the data you are using you may want to use other functions.
+
+
+## Distance relations
+
+st_distance() allows for measurement of distance between spatial objects. 
+
+```{r}
+nz_heighest = nz_height %>% top_n(n = 1, wt = elevation)
+canterbury_centroid = st_centroid(canterbury)
+st_distance(nz_heighest, canterbury_centroid)
+```
+
+Notice the output from st_distance(). It does not only include the value but also includes the units. It is also returned as a matrix because st_distance can be used to create a distance matrix.
+
+EXAMPLE - CREATE DISTANCE MATRIX
+
+
+
+## Spatial Operations on Raster Data
+
+## Spatial Subsetting
+
 
 
 
