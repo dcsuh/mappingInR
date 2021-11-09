@@ -107,3 +107,106 @@ plot(st_geometry(seine_buff_50km))
 ## Affine transformations
 
 Affine transformation is any transformation that preserves lines and parallelism. However, angles or length are not necessarily preserved. Affine transformations include, among others, shifting (translation), scaling and rotation. Additionally, it is possible to use any combination of these. Affine transformations are an essential part of geocomputation. 
+
+The ‘sf’ package implements affine transformation for objects of classes ‘sfg’ and ‘sfc’.
+
+First, make an object of class ‘sfc’
+```{r}
+nz_sfc = st_geometry(nz)
+ ```
+Shifting moves every point by the same distance in map units. 
+```{r}
+nz_shift = nz_sfc + c(0, 100000)
+ ```
+Scaling enlarges or shrinks objects by a factor. This can be done globally or locally. If global, the relative position of the geometry features will stay the same and be scaled together. If scaling locally, then each of the geometry features will scale relative to a point that you must define (usually the centroid).
+```{r}
+nz_scale <- nz_sfc*0.5
+nz_centroid_sfc = st_centroid(nz_sfc)
+nz_scale1 = (nz_sfc - nz_centroid_sfc) * 0.5 + nz_centroid_sfc
+```
+Rotating requires a rotation matrix to be defined
+
+```{r}
+rotation = function(a){
+  r = a * pi / 180 #degrees to radians
+  matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
+} 
+```
+nz_rotate can then be used with the defined rotation matrix wrapped in the rotation function
+```{r}
+nz_rotate = (nz_sfc - nz_centroid_sfc) * rotation(30) + nz_centroid_sfc
+ ```
+Finally, the newly created geometries can replace the old ones with the st_set_geometry() function:
+```{r}
+nz_scale_sf = st_set_geometry(nz, nz_scale)
+```
+## Clipping
+
+Spatial clipping is a form of spatial subsetting that only affects the geometry columns of some of the affected features. Clipping only applies to features more complex than points.
+
+
+This creates a venn diagram with two points x and y for us to use as an example
+
+```{r}
+b = st_sfc(st_point(c(0, 1)), st_point(c(1, 1))) # create 2 points
+b = st_buffer(b, dist = 1) # convert points to circles
+plot(b)
+text(x = c(-0.5, 1.5), y = 1, labels = c("x", "y")) # add text
+
+ ```
+
+This selects the area that is shared between x and y
+```{r}
+x = b[1]
+y = b[2]
+x_and_y = st_intersection(x, y)
+plot(b)
+plot(x_and_y, col = "lightgrey", add = TRUE) # color intersecting area
+ ```
+Use these other functions instead of st_intersection() to try and select other areas of the venn diagram: st_union(), st_difference(), st_sym_difference()
+
+```{r}
+
+ ```
+
+## Geometry Unions
+
+When working with attribute data, we were still able to aggregate features and dissolve polygons together. When we did this we used summarize() and aggregate() but the function that was working behind the scenes to dissolve the polygons was actually st_union(). This function can take two geometries and then unite them.
+
+```{r}
+us_west = us_states[us_states$REGION == "West", ]
+us_west_union = st_union(us_west)
+```
+
+Type transformations
+Geometry casting is a powerful operation that enables transformation of the geometry type. st_cast() is used for this operation and it is important to note that it will behave differently on ‘sfg’, ‘sfc’, and ‘sf’ objects. st_cast() will allow you to change between points, lines, and polygons. When changing between multi versions of these, it will take a multi-object and turn it into multiple different objects. Refer to the online textbook for more information on using st_cast and perform geometric type transformations.
+
+## Geometric operations on raster data
+
+Geometric raster operations include the shift, flipping, mirroring, scaling, rotation or warping of images. 
+
+There are certain geometric operations on raster data that R does not handle well so if you need to perform these then you can work with dedicated GIS softwares and the online textbook also goes in to bridging between R and GIS software in chapter 9.
+
+However, R can handle operations such as changing the extent, resolution, and origin of a raster. This can be important when trying to match raster layers and it can also be useful to aggregate (lower the resolution) of a raster so that it is less computationally intensive.
+
+## Geometric intersections
+We previously saw how to extract values from a raster overlaid by other spatial objects. To retrieve a spatial output, we can use almost the same subsetting syntax. The only difference is that we have to make clear that we would like to keep the matrix structure by setting the drop argument to FALSE. This will return a raster object containing the cells whose midpoints overlap with clip.
+```{r}
+elev = rast(system.file("raster/elev.tif", package = "spData"))
+clip = rast(xmin = 0.9, xmax = 1.8, ymin = -0.45, ymax = 0.45,
+            resolution = 0.3, vals = rep(1, 9))
+elev[clip, drop = FALSE]
+#> class       : SpatRaster 
+#> dimensions  : 2, 1, 1  (nrow, ncol, nlyr)
+#> resolution  : 0.5, 0.5  (x, y)
+#> extent      : 1, 1.5, -0.5, 0.5  (xmin, xmax, ymin, ymax)
+#> coord. ref. : lon/lat WGS 84 (EPSG:4326) 
+#> source      : memory 
+#> name        : elev 
+#> min value   :   18 
+#> max value   :   24
+```
+For the same operation we can also use the intersect() and crop() command.
+ 
+## Extent and Origin
+
