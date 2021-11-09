@@ -196,17 +196,83 @@ elev = rast(system.file("raster/elev.tif", package = "spData"))
 clip = rast(xmin = 0.9, xmax = 1.8, ymin = -0.45, ymax = 0.45,
             resolution = 0.3, vals = rep(1, 9))
 elev[clip, drop = FALSE]
-#> class       : SpatRaster 
-#> dimensions  : 2, 1, 1  (nrow, ncol, nlyr)
-#> resolution  : 0.5, 0.5  (x, y)
-#> extent      : 1, 1.5, -0.5, 0.5  (xmin, xmax, ymin, ymax)
-#> coord. ref. : lon/lat WGS 84 (EPSG:4326) 
-#> source      : memory 
-#> name        : elev 
-#> min value   :   18 
-#> max value   :   24
 ```
 For the same operation we can also use the intersect() and crop() command.
  
 ## Extent and Origin
+
+In order for rasters to match, the extent and origin of the raster need to match. When using publicly available data such as satellite imagery, the files may often come in different resolution or projections. 
+
+If the rasters only differ in their extent then you can use extend() with both rasters as the argument so that the smaller one extends to match the larger one. Also, terra will conveniently throw an error if two rasters do not match.
+
+```{r}
+elev = rast(system.file("raster/elev.tif", package = "spData"))
+elev_2 = extend(elev, c(1, 2)) #extended to be longer than elev
+```
+
+```{r}
+elev_3 = elev + elev_2
+```
+
+```{r}
+elev_4 = extend(elev, elev_2)
+```
+
+By default, the origin is the cell corner closest to the coordinates (0,0). origin() will retrieve the origin of a raster.
+
+```{r}
+origin(elev_4)
+```
+elev_4 conveniently has a corner with coordinates (0,0)
+
+If the origin does not match then the rasters will not match. This can be fixed by using origin() again with the raster as the argument.
+
+```{r}
+# change the origin
+origin(elev_4) = c(0.25, 0.25)
+plot(elev_4)
+plot(elev, add = TRUE) # and add the original raster
+```
+
+
+## Aggregation and disaggregation
+
+Raster datasets can also differ with regard to their resolution. To match resolutions, one can either decrease, using aggregate(), or increase, using disagg(), the resolution of one raster.
+
+In this example, we decrease the resolution by aggregating by a factor of 5. The resulting cell uses the mean of the input cells but the function could be set to other functions such as median() or sum().
+```{r}
+dem = rast(system.file("raster/dem.tif", package = "spDataLarge"))
+dem_agg = aggregate(dem, fact = 5, fun = mean)
+```
+
+By contrast, the disagg() function increases the resolution. However, we have to specify a method on how to fill the new cells. The disagg() function provides two methods. The default one (method = "near") simply gives all output cells the value of the input cell, and hence duplicates values which leads to a blocky output image.
+
+```{r}
+dem_disagg = disagg(dem_agg, fact = 5, method = "near")
+```
+
+bilinear is another method that may produce better looking results.
+
+```{r}
+dem_disagg = disagg(dem_agg, fact = 5, method = "bilinear")
+```
+
+However, with disaggregation we are always interpolating the values for the new cells so the outputs will always be limited by the lower resolution input. Unfortunately, we are not in a hollywood spy action thriller so there is no enhance() function.
+
+insert image https://i.makeagif.com/media/12-29-2016/DhK9ZZ.gif 
+
+## Resampling
+
+Aggregation and disaggregation are useful when changing the resolution of a single raster. However, in other situations you may have multiple rasters with varying extent and resolution so you will want to resample which is a process for computing values for new pixel locations. There are a variety of methods to resample and these are detailed in the online textbook. The simplest versions are nearest neighbor and bilinear interpolation. Nearest neighbor assigns the value of the nearest cell of the original raster to the cell of the target one. It is fast and usually suitable for categorical rasters. Bilinear interpolation assigns a weighted average of the four nearest cells from the original raster to the cell of the target one. This is the fastest method for continuous rasters. To resample you can use the resample() function which allows you to designate the rasters you would like to work with and the method for resampling. For the exercises in this course you will not need to resample but in your own work with raster data you may need to and we suggest turning to the online textbook and other sources for more information on how to best do this for your situation.
+
+
+## Raster-Vector Interactions
+
+This section focuses on interactions between raster and vector geographic data models. It includes four main techniques: raster cropping and masking using vector objects; extracting raster values using different types of vector data; and raster-vector conversion. The above concepts are demonstrated using data used in previous chapters to understand their potential real-world applications.
+
+## Raster cropping
+
+
+
+
 
