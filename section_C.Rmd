@@ -203,7 +203,7 @@ Anyways, terra is useful because it will allow us to do map algebra only if the 
 
 ## Local operations
 
-Local operations are simple because they are just 1-to-1 cell-by-cell operations over two or multiple layers. 
+Local operations are simple because they are just cell-by-cell operations over one or multiple layers. Using local operations, it is easy to add, subtract, multiple, or divide 
 
 ```{r}
 elev + elev
@@ -212,6 +212,52 @@ log(elev)
 elev > 5
 ```
 
+exercise: use the elev raster and write two local operations that will return a raster where all the values are 1. Confirm this using a logical statement (> < =)
+```{r}
+
+```
+
+Local operations can also be used to classify cells and create factors. This is done by creating a classification matrix that includes the rules for the different factors and then using classify() to do the classification.
+
+Make the classification matrix
+```{r}
+rcl <- matrix(c(0, 12, 1, 12, 24, 2, 24, 36, 3), ncol = 3, byrow = TRUE)
+rcl
+```
+
+Classify
+```{r}
+recl <- classify(elev, rcl = rcl)
+```
+
+
+Other valuable functions for local operations include app(), tapp(), and lapp() which allow for efficient map algebra that takes multiple layers and returns a single output layer. If you are using large datasets and want to perform more complex functions then it would be preferable to use these functions. You can find more information about these in section 4.3.3 in the online textbook. Another fun thing you can do with local operations is apply a statistical model to the data where multiple layer can be used as predictors with a single layer as a response variable.
+
+
+## Focal operations
+
+Focal operations differ from local operations because they operate on more than one cell at a time. Focal operations use a focal cell and a defined set of neighbors. Usually, these neighbors are the adjacent cells so that altogether the focal cell and its neighbors make up a 3x3 grid. However, neighbors can be defined in any way. 
+
+The focal() function can be used for focal operations. The way this works is that the focal cell will be given an output that depends on the cell itself and the neighboring cells.
+
+```{r}
+r_focal <- focal(elev, w = matrix(1, nrow = 3, ncol = 3), fun = min)
+```
+Try to guess what this line of code will do.
+
+
+## Zonal operations
+
+Zonal operations are similar to focal operations because they perform a function using multiple cells. However, zonal operations do not use a defined rule for its neighbors but instead use another raster layer, which is usually a categorical raster, to define a 'zonal filter'. Zonal operations are typically used to aggregate data according to the factors of the zonal filter and so they will return a table rather than a raster layer.
+
+```{r}
+z = zonal(elev, grain, fun = "mean")
+z
+```
+
+## Global operations
+
+Global operations are a special case of zonal operations where the 'zonal filter' is just the entire raster layer. A simple operation would be to locate the min or max. a more complex operation could include calculation of distances from all cells to a target cell. 
 
 
 
