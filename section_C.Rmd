@@ -16,10 +16,7 @@ library(spData)
 library(magrittr)
 ```
 
-```{r}
-elev = rast(system.file("raster/elev.tif", package = "spData"))
-grain = rast(system.file("raster/grain.tif", package = "spData"))
-```
+
 
 
 ## Spatial Data Operations
@@ -139,7 +136,81 @@ EXAMPLE - CREATE DISTANCE MATRIX
 
 ## Spatial Operations on Raster Data
 
+We'll use these files for the examples in this section.
+
+```{r}
+elev = rast(system.file("raster/elev.tif", package = "spData"))
+grain = rast(system.file("raster/grain.tif", package = "spData"))
+```
+
 ## Spatial Subsetting
+
+One method of subsetting is to use coordinates. This can be done using the function cellfromXY() or extract(). Both functions are from the 'terra' package. Make sure to index to 'terra' when using extract() because extract() is also a function in the 'tidyverse'
+
+```{r}
+id = cellFromXY(elev, xy = matrix(c(0.1, 0.1), ncol = 2))
+elev[id]
+# the same as
+terra::extract(elev, matrix(c(0.1, 0.1), ncol = 2))
+```
+
+You can also use other rasters to subset a raster. Shown below:
+
+```{r}
+clip = rast(xmin = 0.9, xmax = 1.8, ymin = -0.45, ymax = 0.45,
+            resolution = 0.3, vals = rep(1, 9))
+elev[clip]
+
+terra::extract(elev, ext(clip))
+```
+
+These methods return the values from the cells in the raster. To make a raster by subsetting another raster you can use the [] operator with the 'drop' argument set to FALSE.
+
+These are two ways to do the same thing using the [] operator
+```{r}
+elev[1:2, drop = FALSE]    # spatial subsetting with cell IDs
+elev[1, 1:2, drop = FALSE] # spatial subsetting by row,column indices
+```
+
+Masking is also a common method of subsetting raster data. In masking, you will use a raster where the values of the cells are logical (TRUE or FALSE/NA). You can mask a raster using the mask raster so that you only keep the TRUE cells.
+
+```{r}
+# create raster mask
+rmask = elev
+values(rmask) = sample(c(NA, TRUE), 36, replace = TRUE)
+```
+
+These are two ways of doing the same thing. You can use the [] operator or mask()
+```{r}
+# spatial subsetting
+elev[rmask, drop = FALSE]           # with [ operator
+mask(elev, rmask)                   # with mask()
+```
+
+
+You can also subset using logical statements like below.
+```{r}
+elev[elev < 20] = NA
+```
+
+
+## Map Algebra
+
+One of the benefits of using raster data is the ability to perform map algebra. Map algebra works because raster data are really just matrices of values that implicitly correspond to coordinates. The coordinates are stored as a header in the files which can be used to look up the coordinates that a cell corresponds to. So if we are using multiple rasters that have the same extent, resolution, and projection then we can perform quick operations on them without having to worry about the actual coordinates. If this doesn't make sense then you can imagine using transparencies with an overhead projector. As long as the transparent sheets are designed to be compatible then you can easily align them and project all of the data together. If you were born after 2000 then you probably don't know what I am talking about.
+
+Anyways, terra is useful because it will allow us to do map algebra only if the raster layers correspond with each other. Map algebra can be broken down into four subclasses: local, focal, zonal, and global operations. These vary in how many cells that are processed and what type of output you will receive.
+
+
+## Local operations
+
+Local operations are simple because they are just 1-to-1 cell-by-cell operations over two or multiple layers. 
+
+```{r}
+elev + elev
+elev^2
+log(elev)
+elev > 5
+```
 
 
 
