@@ -272,7 +272,91 @@ This section focuses on interactions between raster and vector geographic data m
 
 ## Raster cropping
 
+The ability to crop and mask rasters using vector data is valuable because raster data is usually over a larger geographic area than your vector data. Limiting your raster data to the geographic area described by your vector geometries will be less computationally expensive and will help to develop nicer maps.
 
+We will use these files to demonstrate raster cropping and masking
+```{r}
+srtm = rast(system.file("raster/srtm.tif", package = "spDataLarge"))
+zion = st_read(system.file("vector/zion.gpkg", package = "spDataLarge"))
+zion = st_transform(zion, crs(srtm))
+```
+
+We can start by using crop() to crop our raster using our vector data. Cropping will limit the raster to the smallest rectangular space that still captures the vector geometry
+```{r}
+srtm_cropped = crop(srtm, vect(zion))
+```
+
+After cropping, we can mask() the rest of the raster data outside the vector area so that it is NA
+```{r}
+srtm_masked = mask(srtm, vect(zion))
+```
+
+mask() can also be altered with the argument 'inverse' set to TRUE to turn all of the raster inside the vector into NA
+```{r}
+srtm_inv_masked = mask(srtm, vect(zion), inverse = TRUE)
+```
+
+Cropping and masking are typically used so that only the area of interest is left.
+
+## Extraction
+
+Raster extraction is the process of identifying and returning the values associated with a ‘target’ raster at specific locations, based on a (typically vector) geographic ‘selector’ object.
+
+The basic example is of extracting the value of a raster cell at specific points. For this purpose, we will use zion_points, which contain a sample of 30 locations within the Zion National Park. The following command extracts elevation values from srtm and creates a data frame with points’ IDs (one value per vector’s row) and related srtm values for each point. Now, we can add the resulting object to our zion_points dataset with the cbind() function:
+```{r}
+data("zion_points", package = "spDataLarge")
+elevation = terra::extract(srtm, vect(zion_points))
+zion_points = cbind(zion_points, elevation)
+```
+
+
+Line selectors can also be used for extraction but it is often better to use a series of points rather than a line. This is achieved by making a line and then splitting it up into many points as demonstrated below:
+
+Make line
+```{r}
+zion_transect = cbind(c(-113.2, -112.9), c(37.45, 37.2)) %>%
+  st_linestring() %>% 
+  st_sfc(crs = crs(srtm)) %>% 
+  st_sf()
+```
+
+Split into points
+```{r}
+zion_transect$id = 1:nrow(zion_transect)
+zion_transect = st_segmentize(zion_transect, dfMaxLength = 250)
+zion_transect = st_cast(zion_transect, "POINT")
+```
+
+Find the distance between points
+```{r}
+zion_transect = zion_transect %>% 
+  group_by(id) %>% 
+  mutate(dist = st_distance(geometry)[, 1]) 
+```
+
+Extract elevation value for each point and combine with main object
+```{r}
+zion_elev = terra::extract(srtm, vect(zion_transect))
+zion_transect = cbind(zion_transect, zion_elev)
+```
+
+What this creates is an elevation map for a straight line through Zion National Park
+
+ADD EXAMPLE IMAGE
+
+
+Finally, polygons can be used for raster extractions. Polygons can return a lot of values per polygon.
+```{r}
+zion_srtm_values = terra::extract(x = srtm, y = vect(zion))
+```
+
+This resulting data frame is useful for calculating summary statistics of certain polygons
+```{r}
+group_by(zion_srtm_values, ID) %>% 
+  summarize(across(srtm, list(min = min, mean = mean, max = max)))
+```
+
+## Rasterization
 
 
 
