@@ -358,5 +358,65 @@ group_by(zion_srtm_values, ID) %>%
 
 ## Rasterization
 
+Rasterization is the conversion of vector objects into their representation in raster objects. The terra package contains the function rasterize() for doing this work. Its first two arguments are, x, vector object to be rasterized and, y, a ‘template raster’ object defining the extent, resolution and CRS of the output. Deciding on which resolution to use can be difficult because if it is too low then the result may miss the full geographic variability of the vector data; if it is too high, computational times may be excessive. 
 
 
+To demonstrate rasterization in action, we will use a template raster that has the same extent and CRS as the input vector data 'cycle_hire_osm_projected' and spatial resolution of 1000 meters:
+```{r}
+cycle_hire_osm_projected = st_transform(cycle_hire_osm, "EPSG:27700")
+raster_template = rast(ext(cycle_hire_osm_projected), resolution = 1000,
+                       crs = st_crs(cycle_hire_osm_projected)$wkt)
+```
+
+rasterize() is used for rasterization and is very flexible. Try to work out what each of these different methods is doing when rasterizing.
+
+```{r}
+ch_raster1 = rasterize(vect(cycle_hire_osm_projected), raster_template,
+                       field = 1)
+```
+
+```{r}
+ch_raster2 = rasterize(vect(cycle_hire_osm_projected), raster_template, 
+                       fun = "length")
+```
+
+```{r}
+ch_raster3 = rasterize(vect(cycle_hire_osm_projected), raster_template, 
+                       field = "capacity", fun = sum)
+```
+
+
+ADD SECTION FOR RASTERIZATION OF LINES
+
+
+## Spatial Vectorization
+
+Vectorization is the conversion of raster objects into their representation in vector objects. It involves converting spatially continuous raster data into spatially discrete vector data such as points, lines or polygons.
+
+The simplest form of vectorization is to convert the centroids of raster cells into points. as.points() does exactly this for all non-NA raster grid cells. Note, here we also used st_as_sf() to convert the resulting object to the sf class.
+
+```{r}
+elev_point = as.points(elev) %>% 
+  st_as_sf()
+```
+
+
+Another common type of spatial vectorization is the creation of contour lines representing lines of a continuous variable such as elevation or temperature.
+```{r}
+dem = rast(system.file("raster/dem.tif", package = "spDataLarge"))
+cl = as.contour(dem)
+plot(dem, axes = FALSE)
+plot(cl, add = TRUE)
+```
+
+
+The final type of vectorization involves conversion of rasters to polygons. This can be done with terra::as.polygons(), which converts each raster cell into a polygon consisting of five coordinates, all of which are stored in memory (explaining why rasters are often fast compared with vectors!).
+
+This is illustrated below by converting the grain object into polygons and subsequently dissolving borders between polygons with the same attribute values (also see the dissolve argument in as.polygons()).
+
+
+```{r}
+grain = rast(system.file("raster/grain.tif", package = "spData"))
+grain_poly = as.polygons(grain) %>% 
+  st_as_sf()
+```
