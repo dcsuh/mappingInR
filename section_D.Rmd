@@ -1,0 +1,26 @@
+---
+title: "section_D"
+author: "Daniel Suh"
+date: "11/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(sf)  
+library(terra)  
+library(tidyverse)  
+library(spData)
+library(spDataLarge)
+library(magrittr)
+```
+
+
+## Geometry operations
+
+So far, we have learned how to perform operations on your data according to the attribute (non-spatial data) and then using the spatial data itself. This section will teach you how to perform operations on the actual spatial geometry data which will allow you to manipulate the geometries, add buffers, or create centroids.
+
+Vector geometries can be manipulated using either unary or binary operations. Unary operations only use the geometry that you are manipulating. Binary operations rely on a separate geometry to make the changes to your target geometry.
