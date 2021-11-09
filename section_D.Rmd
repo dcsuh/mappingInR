@@ -24,3 +24,86 @@ library(magrittr)
 So far, we have learned how to perform operations on your data according to the attribute (non-spatial data) and then using the spatial data itself. This section will teach you how to perform operations on the actual spatial geometry data which will allow you to manipulate the geometries, add buffers, or create centroids.
 
 Vector geometries can be manipulated using either unary or binary operations. Unary operations only use the geometry that you are manipulating. Binary operations rely on a separate geometry to make the changes to your target geometry.
+
+Raster geometries can also be manipulated to change the resolution (number of pixels) and the extent and origin of the raster. This is useful when trying to align different raster data so that you can perform map algebra.
+
+Finally, we will discuss raster-vector interactions.
+
+
+## Geometric operations on vector data
+
+This section focuses on operations performed on the geometry of 'sf' objects which means we will be working with objects of class 'sfc' in addition to objects of class 'sf'
+
+## Simplification
+
+Simplification generalizes lines and polygons to remove detail from the geometries. This is useful to reduce the amount of memory required to visualize these geometries. st_simplify() uses an algorithm for simplifying known as the Douglas-Peucker algorithm with an argument of dTolerance to control the intensity of the simplication.
+
+```{r}
+plot(st_geometry(seine))
+seine_simp = st_simplify(seine, dTolerance = 2000)  # 2000 m
+plot(st_geometry(seine_simp))
+```
+We can also do this with polygons
+
+```{r}
+us_states2163 = st_transform(us_states, 2163)
+plot(st_geometry(us_states2163))
+```
+
+```{r}
+us_states_simp1 = st_simplify(us_states2163, dTolerance = 100000)  # 100 km
+plot(st_geometry(us_states_simp1))
+```
+One issue that you can see is that st_simplify() works on a per-geometry basis. In order to make the borders line up we can use ms_simplify() from 'rmapshaper'
+
+```{r}
+library(rmapshaper)
+# proportion of points to retain (0-1; default 0.05)
+us_states2163$AREA = as.numeric(us_states2163$AREA)
+us_states_simp2 = rmapshaper::ms_simplify(us_states2163, keep = 0.01,
+                                          keep_shapes = TRUE)
+plot(st_geometry(us_states_simp2))
+```
+## Centroids
+
+Centroid operations identify the center of geographic objects. Like the center of anything, there are different ways to define it (e.g. how would you define the center of your body?). One of the most common ways to define the center of geographic objects is to use the center of mass (imagine cutting out the map of Georgia from a piece of paper and balancing it on your finger). st_centroid() allows for calculation of geographic centroids.
+
+```{r}
+nz_centroid <- st_centroid(nz)
+seine_centroid <- st_centroid(seine)
+```
+
+It's possible that the centroid could fall outside of the geometry (consider a donut). In this case, you can use st_point_on_surface which will ensure that points are on the surface of the geometry
+
+```{r}
+nz_pos = st_point_on_surface(nz)
+seine_pos = st_point_on_surface(seine)
+```
+
+
+```{r}
+p_centr1 = tm_shape(nz) + tm_borders() +
+  tm_shape(nz_centroid) + tm_symbols(shape = 1, col = "black", size = 0.5) +
+  tm_shape(nz_pos) + tm_symbols(shape = 1, col = "red", size = 0.5)  
+p_centr2 = tm_shape(seine) + tm_lines() +
+  tm_shape(seine_centroid) + tm_symbols(shape = 1, col = "black", size = 0.5) +
+  tm_shape(seine_pos) + tm_symbols(shape = 1, col = "red", size = 0.5)  
+tmap_arrange(p_centr1, p_centr2, ncol = 2)
+```
+
+
+## Buffers
+
+Buffers are polygons representing the area within a given distance of a geometric feature: regardless of whether the input is a point, line or polygon, the output is a polygon. Buffers are often used for data analysis when you want to know answers to questions such as: how many points are within this distance of this line?
+
+```{r}
+seine_buff_5km = st_buffer(seine, dist = 5000)
+seine_buff_50km = st_buffer(seine, dist = 50000)
+plot(st_geometry(seine))
+plot(st_geometry(seine_buff_5km))
+plot(st_geometry(seine_buff_50km))
+```
+
+## Affine transformations
+
+Affine transformation is any transformation that preserves lines and parallelism. However, angles or length are not necessarily preserved. Affine transformations include, among others, shifting (translation), scaling and rotation. Additionally, it is possible to use any combination of these. Affine transformations are an essential part of geocomputation. 
