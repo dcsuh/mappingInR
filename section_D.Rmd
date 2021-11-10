@@ -245,7 +245,8 @@ Raster datasets can also differ with regard to their resolution. To match resolu
 
 In this example, we decrease the resolution by aggregating by a factor of 5. The resulting cell uses the mean of the input cells but the function could be set to other functions such as median() or sum().
 ```{r}
-dem = rast(system.file("raster/srtm.tif", package = "spDataLarge"))
+data(dem, package="spDataLarge")
+dem <- rast(dem)
 dem_agg = aggregate(dem, fact = 5, fun = mean)
 plot(dem)
 plot(dem_agg)
@@ -409,7 +410,8 @@ elev_point = as.points(elev) %>%
 
 Another common type of spatial vectorization is the creation of contour lines representing lines of a continuous variable such as elevation or temperature.
 ```{r}
-#dem = rast(system.file("raster/dem.tif", package = "spDataLarge"))
+data(dem, package="spDataLarge")
+dem <- rast(dem)
 cl = as.contour(dem)
 plot(dem, axes = FALSE)
 plot(cl, add = TRUE)
