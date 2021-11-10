@@ -15,6 +15,10 @@ You can view these as the knitted html versions or you can use the download link
       * [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_C.Rmd)
       
 * Day 2
+  * [Section D](https://dcsuh.github.io/mappingInR/section_D)  
+      * [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_D.Rmd)
+  * [Section E](https://dcsuh.github.io/mappingInR/section_E)  
+      * [(download .Rmd)](https://dcsuh.github.io/mappingInR/section_E.Rmd)
 
 ### About the workshop materials:
 
