@@ -4,7 +4,7 @@ This page is used to host the materials for the [CEID's Disease Mapping Working 
 
 ### See below for all workshop materials:
 
-[2021 Itinerary](https://docs.google.com/document/d/1wEpjlUB4vdsYpHwN3s0hQ2JCSBszsMJz82L3G9DVlxc/edit?usp=sharing)
+[2021 Itinerary](https://docs.google.com/document/d/1wEpjlUB4vdsYpHwN3s0hQ2JCSBszsMJz82L3G9DVlxc/edit?usp=sharing){:target="_blank"}
 
 You can view these as the knitted html versions or you can use the download link to download the original .Rmd files.
 
