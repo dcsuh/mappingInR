@@ -269,3 +269,45 @@ This will create the animation and save it onto your computer. You'll want to de
 #tmap_animation(urb_anim, filename = "urb_anim.gif", delay = 25)
 ```
 
+
+## Interactive maps
+
+The development of packages for interactive maps in R has made interactivity extremely accessible. 'tmap' makes this easy by allowing most static maps easily transferrable to interactive maps using tmap_mode()
+
+See below for an example of turning 'map_nz' into a simple interactive map using tmap_mode("view")
+
+```{r}
+tmap_mode("view")
+map_nz
+```
+
+Now that tmap_mode() has been set to "view", all of the maps generated with tmap will show up as interactive maps
+
+```{r}
+map_nza
+```
+
+You can return to static maps by using tmap_mode("plot")
+
+```{r}
+tmap_mode("plot")
+map_nza
+```
+
+Another package that allows for quick generation of interactive maps is 'mapview'
+
+
+MAPVIEW EXAMPLES
+
+
+leaflet is another option that is more low-level allowing for more customization
+
+LEAFLET EXAMPLES
+
+
+## Mapping Applications
+
+If we have time
+
+## Shiny integration
+
