@@ -2,7 +2,6 @@
 title: "section_D"
 subtitle: "https://dcsuh.github.io/mappingInR/"
 author: "Daniel Suh"
-date: "11/9/2021"
 output: html_document
 ---
 

@@ -2,7 +2,6 @@
 title: "section_C"
 subtitle: "https://dcsuh.github.io/mappingInR/"
 author: "Daniel Suh"
-date: "10/29/2021"
 output: html_document
 ---
 ```{r global options, include=FALSE}
