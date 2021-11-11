@@ -256,4 +256,16 @@ print(alaska_map, vp = grid::viewport(0.15, 0.15, width = 0.3, height = 0.3))
 
 ## Animated maps
 
+Rather than using faceted plots, animated maps can help visualize the same data using less space and in a more intuitive way. 
+
+```{r}
+urb_anim = tm_shape(world) + tm_polygons() + 
+  tm_shape(urban_agglomerations) + tm_dots(size = "population_millions") +
+  tm_facets(along = "year", free.coords = FALSE)
+```
+
+This will create the animation and save it onto your computer. You'll want to designate the filepath so that you can easily find it. This will default into your current working directory. If you are using MacOS then you can view it as a gif by opening it using cmd+y
+```{r}
+#tmap_animation(urb_anim, filename = "urb_anim.gif", delay = 25)
+```
 
