@@ -19,16 +19,16 @@ library(spDataLarge)
 
 # Data types
 
-Geographic data can be broken down into two fundamental data models: **vector** and **raster** data. It is vital to understand the differences between vector and raster data because we handle them differently.
+Geographic data can be broken down into two fundamental data models: **vector** and **raster** data. Vector and raster data both represent geographic data but their uses and functionality differ dramatically.
 
 ### Vector Data
 
-Vector data consist of points, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent meaningful and tangible structures such as a bus stop (point), a road (line), or a county (polygon).
+Vector data consist of points, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent tangible structures such as a bus stop (point), a road (line), or a county (polygon).
 
 
 ### Raster Data
 
-Raster data are really just matrices and so can be thought of as a grid of cells. These cells are analogous to the pixels that make up an image. Raster data are commonly used to represent continuous data over a spatial area such as elevation or temperature. 
+Raster data are a grid of regularly sized cells and can be treated as data matrices. The cells of a raster are analogous to the pixels that make up an image. Raster data are commonly used to represent continuous data such as elevation or temperature. 
 
 
 ## Packages
@@ -41,6 +41,8 @@ There are a variety of packages for working with spatial data and these have imp
 Before we move any further, it is also vital that you understand Coordinate Reference Systems (CRS). Broadly speaking, coordinate reference systems define how the spatial elements of the data relate to the surface of Earth (or any other celestial body you may be studying).
 
 CRS's can be either geographic or projected. Most of us are already familiar with the conventions of a geographic CRS. A geographic CRS uses longitude and latitude to describe any location on the Earth's surface. However, not all geographic CRS's are made alike and each must make different assumptions about the Earth's surface. Projected CRS's are based off of a geographic CRS and are made by converting a three-dimensional surface into a flat two-dimensional surface. They have an origin, x and y axes, and a linear unit of measurement such as meters.
+
+The most important thing to understand about CRS's is that these should be consistent throughout your analysis. Unfortunately, there is no universal standard for CRS because each CRS has its own advantages and disadvantages. Identification of CRS's can also differ but we recommend using either Spatial Reference System Identifier (SRID) or well-known-text (WKT2).
 
 In order to get the CRS of a spatial vector object you can use st_CRS()
 
@@ -60,12 +62,24 @@ crs(my_rast) #access CRS information
 #crs(my_rast) = "EPSG:26912" # set CRS
 ```
 
-The most important thing to understand about CRS's is that these should be consistent throughout your analysis. Unfortunately, there is no universal standard for CRS because each CRS has its own advantages and disadvantages. Identification of CRS's can also differ but we recommend using either Spatial Reference System Identifier (SRID) or well-known-text (WKT2). For the purposes of the exercises in this workshop, we will make sure that CRS's are appropriately used, but this is something you will need to manage in your own projects, especially when gather data from different sources. For more in depth knowledge on how to identify and change CRS's please see section 2.4 and chapter 6 of the online textbook.
+We will make sure that CRS's are appropriately used during this workshop, but this is something you will need to manage in your own projects, especially when gathering data from different sources. For more in depth knowledge on CRS's please see section 2.4 and chapter 6 of the online textbook.
 
 
 ## Units
 
-Another aspect of working with spatial data that needs to be consistent are units. Attribute data and CRS's can all be using different units which will be problematic for analysis. Again, we will ensure that units are appropriate during this workshop, but you will have to monitor this closely in your own work. Additional information on the subject can be found in section 2.5 of the online textbook.
+Another aspect of working with spatial data that needs to be consistent are units. Attribute data and CRS's can all be using different units which will be problematic for analysis. 
+
+For vector data, the 'sf' package supports units so they are built in.
+
+```{r}
+luxembourg <- world[world$name_long == "Luxembourg", ]
+st_area(luxembourg)
+```
+
+For raster data, units are not currently supported. You can infer the units from the CRS that you are using. For example, EPSG:4326 uses decimal degrees as units.
+
+
+Again, we will ensure that units are appropriate during this workshop, but you will have to monitor this closely in your own work. Additional information on the subject can be found in section 2.5 of the online textbook.
 
 ***
 
