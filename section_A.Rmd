@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r}
+```{r, message=F}
 library(sf)
 library(terra)
 library(spData)
@@ -19,16 +19,16 @@ library(spDataLarge)
 
 # Data types
 
-Geographic data can be broken down into two fundamental data models: **vector** data and **raster** data. It is vital to understand the differences between vector and raster data because we handle them in different ways.
+Geographic data can be broken down into two fundamental data models: **vector** and **raster** data. It is vital to understand the differences between vector and raster data because we handle them differently.
 
 ### Vector Data
 
-Vector data consist of point, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent meaningful and tangible structures such as a bus stop (point), a road (line), or a county (polygon). The types of maps that we regularly use in our lives are often visualizations of vector data.
+Vector data consist of points, lines, and polygons. The point is the most fundamental of the three since lines and polygons are simply points that have been connected. Vector data are often used to represent meaningful and tangible structures such as a bus stop (point), a road (line), or a county (polygon).
 
 
 ### Raster Data
 
-Raster data can be thought of as a grid of cells. These cells are analogous to the pixels that make up an image and are consequently often referred to as pixels. Raster data are commonly used to represent continuous data over a spatial area such as elevation or temperature. 
+Raster data are really just matrices and so can be thought of as a grid of cells. These cells are analogous to the pixels that make up an image. Raster data are commonly used to represent continuous data over a spatial area such as elevation or temperature. 
 
 
 ## Packages
@@ -40,16 +40,36 @@ There are a variety of packages for working with spatial data and these have imp
 
 Before we move any further, it is also vital that you understand Coordinate Reference Systems (CRS). Broadly speaking, coordinate reference systems define how the spatial elements of the data relate to the surface of Earth (or any other celestial body you may be studying).
 
-CRS's can be either geographic or projected. Most of us are already familiar with the conventions of a geographic CRS. Any geographic CRS uses longitude and latitude to describe any location on the Earth's surface. However, not all geographic CRS's are made alike and each must make different assumptions about the Earth's surface. 
+CRS's can be either geographic or projected. Most of us are already familiar with the conventions of a geographic CRS. A geographic CRS uses longitude and latitude to describe any location on the Earth's surface. However, not all geographic CRS's are made alike and each must make different assumptions about the Earth's surface. Projected CRS's are based off of a geographic CRS and are made by converting a three-dimensional surface into a flat two-dimensional surface. They have an origin, x and y axes, and a linear unit of measurement such as meters.
+
+In order to get the CRS of a spatial vector object you can use st_CRS()
+
+```{r}
+st_crs(world)
+```
+
+User input is the SRID and wkt is the complete well-known-text (WKT2) representation. st_set_crs() is used to set the CRS of a vector object. The first argument will be the object and the second argument will be the SRID or the complete WKT2 representation.
+
+
+For raster data, crs() can be used to access and assign CRS information.
+
+```{r}
+raster_filepath = system.file("raster/srtm.tif", package = "spDataLarge")
+my_rast = rast(raster_filepath)
+crs(my_rast) #access CRS information
+#crs(my_rast) = "EPSG:26912" # set CRS
+```
 
 The most important thing to understand about CRS's is that these should be consistent throughout your analysis. Unfortunately, there is no universal standard for CRS because each CRS has its own advantages and disadvantages. Identification of CRS's can also differ but we recommend using either Spatial Reference System Identifier (SRID) or well-known-text (WKT2). For the purposes of the exercises in this workshop, we will make sure that CRS's are appropriately used, but this is something you will need to manage in your own projects, especially when gather data from different sources. For more in depth knowledge on how to identify and change CRS's please see section 2.4 and chapter 6 of the online textbook.
+
 
 ## Units
 
 Another aspect of working with spatial data that needs to be consistent are units. Attribute data and CRS's can all be using different units which will be problematic for analysis. Again, we will ensure that units are appropriate during this workshop, but you will have to monitor this closely in your own work. Additional information on the subject can be found in section 2.5 of the online textbook.
 
+***
 
-## Vector Data and simple features
+# Vector Data and simple features
 
 'sf' stands for simple features which is an open standard for working with vector geometry data. Simple features can support all common vector geometry types such as points, lines, polygons and the 'multi' versions of each of these. Geometry collections are also supported which can include multiple data types in one object.
 
@@ -66,6 +86,8 @@ Let's use 'plot' from the 'sf' package to quickly visualize the data from 'world
 ```{r}
 plot(world)
 ```
+
+
 cool map!
 
 ## A note on simple features and the 'sf' package.
@@ -102,18 +124,34 @@ Simple feature geometries will be represented by class 'sfg' and these are the g
 2. A matrix: a set of points, where each row represents a point, a multipoint or linestring
 3. A list: a collection of objects such as matrices, multilinestrings or geometry collections
 
+```{r}
+point1 = st_point(c(5, 2))
+point2 = st_point(c(1, 3))
+class(point1)
+```
+
+
+
 ## Simple feature columns
 
 One sfg object contains only a single simple feature geometry. A simple feature geometry column 'sfc' is a list of sfg objects, which is additionally able to contain information about the coordinate reference system in use. 'sfc' represents the geometry column in 'sf' data frames. 'sfc' can contain multiple simple feature geometries and these will usually be of the same type but they do not have to be. However, it is important that all the geometries are of the same CRS since 'sfc' can contain information about the CRS. 
 
-add example here for checking the CRS and making sure it is the same? This seems like a point where people might get somewhat lost.
+
+```{r}
+points_sfc <- st_sfc(point1, point2)
+class(points_sfc)
+```
+
+check the CRS for the points_sfc object. After that, make a new object that uses points_sfc and add the CRS 4326
+```{r}
+
+```
 
 
 ## 'sf' class
 simple feature geometries and simple feature geometry columns make up all of the important spatial information that we want. Usually, though, we also want to associate these data with non-spatial data known as attributes. Objects of class 'sf' accomplish these by combining attribute data with 'sfc' objects. This results in 'sf' objects which can be treated like regular data frames with an added column for spatial data. When working with vector data, most of your analysis will likely be based off of the final 'sf' objects.
 
-add example here for actually making an sf object by combining a regular data frame and an sfc?
-
+***
 
 ## Raster data and 'terra'
 
@@ -152,15 +190,6 @@ new_raster = rast(nrows = 6, ncols = 6, resolution = 0.5,
 
 'SpatRaster's can also handle rasters with multiple layers and those layers can be subsetted using terra:subset() and combined using c().
 
-
-### Glossary?
-vector
-raster
-CRS
-geometry type
-'sf' object
-'sfg' object
-online textbook
 
 
 ### Exercises
