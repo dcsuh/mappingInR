@@ -162,7 +162,7 @@ points_sfc <- st_sfc(point1, point2)
 class(points_sfc)
 ```
 
-check the CRS for the points_sfc object. After that, make a new object that uses points_sfc and add the CRS 4326
+check the CRS for the points_sfc object. After that, make a new object that uses points_sfc and add the CRS 4326 (hint: st_crs() and st_set_crs())
 ```{r}
 
 ```
