@@ -17,9 +17,7 @@ library(magrittr)
 ```
 
 
-
-
-## Spatial Data Operations
+# Spatial Data Operations
 
 Spatial objects are primarily described using their location and shape and these characteristics are used for most spatial data operations. In the case of vector data, many of these operations are analogous to their attribute data counterpart. Subsetting, joining, and aggregation use similar functions but there are additional decisions to be made when dealing with vector data. For example, if you want to know if a point lies inside a polygon then you will need to decide if a point that intersects with the border of that polygon still counts and if you want to include any points that are close to being inside the polygon. For raster spatial data, we will build off of what we learned for raster attribute data and add map algebra and the different classes of raster operations: local, focal, zonal, and global.
 
@@ -32,6 +30,7 @@ canterbury <- nz %>% filter(Name == "Canterbury")
 canterbury_height <- nz_height[canterbury, ]
 ```
 Describe what these two lines of code do and what canterbury_height represents.
+
 
 
 Using the [] operator, we can understand subsetting as x[y,] where 'x' is a target which is subsetted using the contents of a source object 'y'. In attribute subsetting, y is often a condition that will be logically evaluated (e.g. data[1:6,] means IF value is of row 1:6 then TRUE, else is FALSE). In subsetting 'sf' objects, y can be another 'sf' object. In this scenario the condition is whether the 'y' 'sf' object has a relationship with the 'x' 'sf' object. The types of topological relationships that we usually use for subsetting are 'intersects', 'touches', 'crosses', and 'within' ('intersects' is the most comprehensive of these and includes 'touches', 'crosses', and 'within'). These are functions from the 'sf' package that can be passed to the [] operator using the 'op =' argument.
@@ -63,14 +62,15 @@ p <- st_cast(st_sfc(p_multi), "POINT")
 
 plot(c(a,l,p))
 ```
-There are a number of questions we can ask about these geometries. Which points intersect with the line? Which points lie within the polygon? Which points are neither intersecting or within any other geometries? The 'sf' functions provide simple verbs to help us bridge our questions to code.
+
+There are a number of questions we can ask about these geometries. Which points intersect with the line? Which points lie within the polygon? Which points are neither intersecting or within any other geometries? The 'sf' functions provide simple verbs to help us bridge our questions to code. (see the st_intersects documentation for help)
 
 We've answered the first question below. Add a couple lines of code to answer the other questions
 ```{r}
 st_intersects(p, l)
 ```
 
-You can check section 4.2.2 in the online textbook for more details but if you want the output to be stored as a single vector then your syntax should match what we show below.
+The default output from these functions are matrices in which each row represents a feature in the target object and each column represents a feature in the selecting object. You can check section 4.2.2 in the online textbook for more details but if you want the output to be stored as a single vector then your syntax should match what we show below.
 
 ```{r}
 st_intersects(p, l, sparse = FALSE)[, 1]
@@ -90,14 +90,43 @@ Joining two non-spatial datasets relies on a shared variable. Spatial data joini
 
 By default, st_join() performs a left join, but it can also do inner joins by setting the argument left = FALSE. Like spatial subsetting, the default topological operator used by st_join() is st_intersects(). This can be changed with the join argument (see ?st_join for details). 
 
-ADD EXAMPLE
+Here is a code chunk that will generate some random points.
+```{r}
+set.seed(2018) # set seed for reproducibility
+(bb_world = st_bbox(world)) # the world's bounds
+#>   xmin   ymin   xmax   ymax 
+#> -180.0  -89.9  180.0   83.6
+random_df = tibble(
+  x = runif(n = 10, min = bb_world[1], max = bb_world[3]),
+  y = runif(n = 10, min = bb_world[2], max = bb_world[4])
+)
+random_points = random_df %>% 
+  st_as_sf(coords = c("x", "y")) %>% # set coordinates
+  st_set_crs(4326) # set geographic CRS
+```
+
+Now we can join these random points to our world dataset. How many of our random points intersect with a country? (don't answer by looking at the map)
+```{r}
+plot(world$geom, reset = FALSE)
+plot(random_points, add = TRUE, col = "red")
+
+random_joined = st_join(random_points, world["name_long"])
+```
 
 
 ## Non-overlapping joins
 
 Sometimes geographic datasets may not actually touch but may be related to each other. In this case, you may want to join these datasets which can be accomplished using st_join() with st_is_within_distance() passed in as an argument.
 
-ADD EXAMPLE
+
+```{r}
+plot(world$geom, reset = FALSE)
+plot(random_points, add = TRUE, col = "red")
+random_joined_1 = st_join(random_points, world["name_long"], join = st_is_within_distance, dist = 150000)
+```
+
+How many more countries are included when dist is set to 100,000? 150,000? 200,000? What are the units?
+
 
 ## Spatial data aggregation
 
@@ -130,8 +159,19 @@ st_distance(nz_heighest, canterbury_centroid)
 
 Notice the output from st_distance(). It does not only include the value but also includes the units. It is also returned as a matrix because st_distance can be used to create a distance matrix.
 
-EXAMPLE - CREATE DISTANCE MATRIX
+This code chunk creates a distance matrix for the first three rows of nz_height to Canterbury and Otago.
+```{r}
+co = filter(nz, grepl("Canter|Otag", Name))
+st_distance(nz_height[1:3, ], co)
+```
 
+Can you guess why some of the values returned in the distance matrix are 0?
+
+You can check the map for help.
+```{r}
+plot(st_geometry(co))
+plot(st_geometry(nz_height)[1:3], add = TRUE)
+```
 
 
 ## Spatial Operations on Raster Data
@@ -212,7 +252,7 @@ log(elev)
 elev > 5
 ```
 
-exercise: use the elev raster and write two local operations that will return a raster where all the values are 1. Confirm this using a logical statement (> < =)
+Use the elev raster and write two local operations that will return a raster where all the values are 1. Confirm this using a logical operator (> < =)
 ```{r}
 
 ```
@@ -264,16 +304,12 @@ Global operations are a special case of zonal operations where the 'zonal filter
 E1. It was established in Section 4.2 that Canterbury was the region of New Zealand containing most of the 100 highest points in the country. How many of these high points does the Canterbury region contain?
 
 ```{r}
-nz_high_points = nz %>%
-  st_join(nz_height) %>%
-  group_by(Name) %>%
-  summarize(count = n())
+
 ```
 
 
 E2. Which region has the second highest number of nz_height points in, and how many does it have?
 
-West Coast
 
 
 E3. Generalizing the question to all regions: how many of New Zealand’s 16 regions contain points which belong to the top 100 highest points in the country? Which regions?
