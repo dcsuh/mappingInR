@@ -107,6 +107,7 @@ cool map!
 ### A note on simple features and the 'sf' package.
 
 'sf' is not the first package that has been primarily used for working with spatial data in R. 'sp' is a package with similar functionality but is being superseded by 'sf'. Because 'sf' is newer you might find that some packages don't currently support 'sf' objects but will support 'sp' objects. However, many packages are beginning to adapt to 'sf' and there are already a number of mapping packages that are set up for an 'sf' workflow. We'll focus on those packages later on in the workshop.
+
 ***
 
 Take some time now to play around with plot() and the 'world' data. You should find that it is already pretty intuitive to use to make some simple maps. Run this example code and then describe how the second map is different than the first and how this is designated in the code. After that, spend some time to make a different map of your own and show it to somebody.
