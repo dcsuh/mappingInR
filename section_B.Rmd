@@ -20,10 +20,14 @@ library(magrittr)
 
 Attribute data is non-spatial information associated with geographic (geometry) data. Understanding how to manipulate attribute data in vector and raster datasets is important because you will likely be performing operations on these data throughout your analysis. Fortunately, in 'sf' objects these operations are analagous to working with data frames. For raster objects, each cell contains a single attribute value so it is important that each raster layer is consistently defined.
 
+***
 
 ## Vector Attribute Manipulation
 
-The most significant difference between data frames and 'sf' objects is that 'sf' objects include the 'geometry' column. A useful feature of this column is that it is "sticky" and will remain appended to the attribute data unless explicitly removed. For example, read in the 'world' dataset and select out a single column.
+The most significant difference between data frames and 'sf' objects is that 'sf' objects include the 'geometry' column. A useful feature of this column is that it is "sticky" and will remain appended to the attribute data unless explicitly removed. 
+
+
+For example, read in the 'world' dataset and then select out a single column.
 
 ```{r}
 summary(world)
@@ -31,7 +35,7 @@ summary(world)
 ```
 NOTE: It is useful to index to the package specifically when using certain functions like select(). This is especially true when working with 'sf' and 'terra' which share a number of function names.
 
-Notice how the 'geom' column remains even without being explicitly selected for.
+Which columns remain after using select()?
 
 If you really need to remove the 'geometry' column from an 'sf' object then you can use the conveniently named st_drop_geometry() function. Removing the 'geometry' column can be useful because operations on the attribute data alone can sometimes be faster. However, it is usually helpful to keep the 'geometry' column included and there shouldn't be any instances during this workshop when you'll need to drop it.
 
@@ -41,6 +45,13 @@ If you really need to remove the 'geometry' column from an 'sf' object then you 
 Vector attribute subsetting can be accomplished using the base R operators such as [] and subset() or the dplyr functions filter(), slice(), or select().
 
 Base R and dplyr functions both work well for subsetting 'sf' objects while maintaining them as 'sf' objects. However, if you use operators such as $ or [[]] or the dplyr function pull() then you should expect to receive vectors rather than 'sf' objects. Vectors, by definition, will only store information from a single column which means you will lose the 'geometry' column.
+
+Use 'world' to create a new 'sf' object that only includes data on name, continent, region, area, and population for countries that have an area greater than 50,000 km^2.
+
+```{r}
+
+```
+
 
 ## Vector Attribute Aggregation
 
@@ -54,13 +65,13 @@ world_cont_pop <- world %>%
   summarize(pop = sum(pop, na.rm=T))
 world_cont_pop
 ```
-Let's try to write a pipe that only includes Asia, Europe, and Africa and summarize each continent by total area.
+Let's try to write a pipe that only includes Asia, Europe, and Africa and summarizes each continent by total area.
 
 ```{r}
 
 ```
 
-Here is another slightly more invovled example. If you have time, then add a comment to each line to describe what it does.
+Here is another slightly more involved example. If you have time, then add a comment to each line to describe what it does.
 ```{r}
 world_agg <- world %>% 
   st_drop_geometry() %>%                      
@@ -97,10 +108,11 @@ world %>%
   mutate(pop_dens = pop / area_km2)
 ```
 
+***
 
 ## Manipulating Raster Objects
 
-Raster objects can not be manipulated like vector objects since these represent continuous surfaces rather than geometric objects (points, lines, and polygons). For raster objects, we will primarily use the [] operators for subsetting. First, we can create a couple raster object that we can work with.
+Raster objects can not be manipulated like vector objects since these represent continuous surfaces rather than geometric objects (points, lines, and polygons). For raster objects, we will primarily use the [] operators for subsetting. First, we can create a couple raster objects that we can work with.
 
 This chunk creates a 6x6 raster that will represent elevation (continuous data).
 ```{r}
@@ -135,11 +147,12 @@ multi <- c(elev,grain)
 
 'terra' includes helpful functions to gather descriptive statistics from raster objects. A few of these include some familiar functions such as boxplot(), hist(), and summary()
 
-Try a few of these out and compare with your neighbor. ('grain' had cells that were randomly assigned so you should expect different answers)
+Try a few of these out and compare with your neighbor. ('grain' had cells that were randomly assigned so you should expect different answers for that raster)
 ```{r}
 
 ```
 
+***
 
 For these exercises we will use the us_states and us_states_df datasets from the spData package:
 
@@ -147,20 +160,16 @@ us_states is a spatial object (of class sf), containing geometry and a few attri
 
 E1. Create a new object called us_states_name that contains only the NAME column from the us_states object. What is the class of the new object and what makes it geographic?
 
-The object is still an sf because the geometry column is sticky and remains
 
 ```{r}
-us_states_name <- us_states %>% dplyr::select(NAME)
-class(us_states_name)
+
 ```
 
 
 E2. Select columns from the us_states object which contain population data. Obtain the same result using a different command (bonus: try to find three ways of obtaining the same result). Hint: try to use helper functions, such as contains or starts_with from dplyr (see ?contains).
 
 ```{r}
-us_states_pop_1 <- us_states %>% dplyr::select(total_pop_10, total_pop_15)
-us_states_pop_2 <- us_states %>% dplyr::select(contains("pop"))
-us_states_pop_3 <- us_states %>% dplyr::select(starts_with("total_pop"))
+
 ```
 
 
@@ -171,132 +180,104 @@ Belong to the West region, have an area below 250,000 km2and in 2015 a populatio
 Belong to the South region, had an area larger than 150,000 km2 or a total population in 2015 larger than 7,000,000 residents.
 
 ```{r}
-midwest <- us_states %>% filter(REGION=="Midwest")
-west_subset <- us_states %>% filter(REGION=="West" & as.numeric(AREA) < 250000 & as.numeric(total_pop_15) > 5000000)
-south_subset <- us_states %>% filter(REGION=="South" & as.numeric(AREA) > 150000 & as.numeric(total_pop_15) > 7000000)
-bonus <- rbind(midwest,west_subset,south_subset)
-plot(st_geometry(bonus))
+
 ```
 
 
 E4. What was the total population in 2015 in the us_states dataset? What was the minimum and maximum total population in 2015?
 
 ```{r}
-sum(us_states$total_pop_15)
-min(us_states$total_pop_15)
-max(us_states$total_pop_15)
+
 ```
 
 
 E5. How many states are there in each region?
 
 ```{r}
-table(us_states$REGION)
+
 ```
 
 
 E6. What was the minimum and maximum total population in 2015 in each region? What was the total population in 2015 in each region?
 
 ```{r}
-pop_15 <- us_states %>% group_by(REGION) %>% summarize(min=min(total_pop_15),max=max(total_pop_15),total=sum(total_pop_15))
-pop_15
+
 ```
 
 
 E7. Add variables from us_states_df to us_states, and create a new object called us_states_stats. What function did you use and why? Which variable is the key in both datasets? What is the class of the new object?
-left_join because I only care about the data that still has the geometry. State name. sf.
+
 ```{r}
-us_states_df %<>% mutate(NAME=state)
-us_states_stats <- left_join(us_states,us_states_df,by="NAME")
-class(us_states_stats)
+
 ```
 
 
 E8. us_states_df has two more rows than us_states. How can you find them? (hint: try to use the dplyr::anti_join() function)
 
 ```{r}
-anti_join(us_states_df,us_states)
+
 ```
 
 
 E9. What was the population density in 2015 in each state? What was the population density in 2010 in each state?
 
 ```{r}
-us_states_stats %<>% mutate(pop_density_10 = total_pop_10/AREA, pop_density_15 = total_pop_15/AREA)
-head(us_states_stats$pop_density_10)
+
 ```
 
 
 E10. How much has population density changed between 2010 and 2015 in each state? Calculate the change in percentages and map them.
 
 ```{r}
-us_states_stats %<>% mutate(perc_change = pop_density_15/pop_density_10)
-plot(us_states_stats["perc_change"])
+
 ```
 
 
 E11. Change the columns’ names in us_states to lowercase. (Hint: helper functions - tolower() and colnames() may help.)
 
 ```{r}
-us_states %<>% rename_all(tolower)
+
 ```
 
 
 E12. Using us_states and us_states_df create a new object called us_states_sel. The new object should have only two variables - median_income_15 and geometry. Change the name of the median_income_15 column to Income.
 
 ```{r}
-us_states_sel <- us_states_stats %>% dplyr::select(median_income_15) %>% transmute(Income = median_income_15)
+
 ```
 
 
 E13. Calculate the change in the number of residents living below the poverty level between 2010 and 2015 for each state. (Hint: See ?us_states_df for documentation on the poverty level columns.) Bonus: Calculate the change in the percentage of residents living below the poverty level in each state.
 
 ```{r}
-us_states_stats %<>% mutate(pov_pop_change = poverty_level_15 - poverty_level_10, 
-                            perc_pov_10 = poverty_level_10/total_pop_10, 
-                            perc_pov_15 = poverty_level_15/total_pop_15,
-                            pov_perc_change = perc_pov_15 - perc_pov_10)
-plot(us_states_stats["pov_perc_change"])
+
 ```
 
 
 E14. What was the minimum, average and maximum state’s number of people living below the poverty line in 2015 for each region? Bonus: What is the region with the largest increase in people living below the poverty line?
 
 ```{r}
-pov_stats_15 <- us_states_stats %>% group_by(state) %>% summarize(min=min(poverty_level_15),max=max(poverty_level_15),mean=mean(poverty_level_15))
-pov_stats_15[order(pov_stats_15$max,decreasing = T),]
+
 ```
 
 
 E15. Create a raster from scratch with nine rows and columns and a resolution of 0.5 decimal degrees (WGS84). Fill it with random numbers. Extract the values of the four corner cells.
 
 ```{r}
-random_rast <- rast(nrows = 9, ncols = 9, resolution = 0.5, vals = 0:99)
-random_rast[1,1]
-random_rast[9,9]
-random_rast[1,9]
-random_rast[9,1]
+
 ```
 
 
 E16. What is the most common class of our example raster grain (hint: modal())?
 
 ```{r}
-grain_order = c("clay", "silt", "sand")
-grain_char = sample(grain_order, 36, replace = TRUE)
-grain_fact = factor(grain_char, levels = grain_order)
-grain = rast(nrows = 6, ncols = 6, resolution = 0.5, 
-             xmin = -1.5, xmax = 1.5, ymin = -1.5, ymax = 1.5,
-             vals = grain_fact)
-modal(grain_char)
+
 ```
 
 
 E17. Plot the histogram and the boxplot of the data(dem, package = "spDataLarge") raster.
 
 ```{r}
-data(dem, package="spDataLarge")
-hist(dem)
-boxplot(dem)
+
 ```
 
