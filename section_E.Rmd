@@ -296,20 +296,35 @@ map_nza
 Another package that allows for quick generation of interactive maps is 'mapview'
 
 
-MAPVIEW EXAMPLES
+```{r}
+library(mapview)
+trails %>%
+  st_transform(st_crs(franconia)) %>%
+  st_intersection(franconia[franconia$district == "Oberfranken", ]) %>%
+  st_collection_extract("LINE") %>%
+  mapview(color = "red", lwd = 3, layer.name = "trails") +
+  mapview(franconia, zcol = "district", burst = TRUE) +
+  breweries
+```
 
 
 leaflet is another option that is more low-level allowing for more customization
 
-LEAFLET EXAMPLES
+```{r}
+pal = colorNumeric("RdYlBu", domain = cycle_hire$nbikes)
+leaflet(data = cycle_hire) %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addCircles(col = ~pal(nbikes), opacity = 0.9) %>% 
+  addPolygons(data = lnd, fill = FALSE) %>% 
+  addLegend(pal = pal, values = ~nbikes) %>% 
+  setView(lng = -0.1, 51.5, zoom = 12) %>% 
+  addMiniMap()
+```
 
 
-## Mapping Applications
+## More mapping options
 
-If we have time
-
-## Shiny integration
-
+To see more mapping options, you can check out the rest of the material in Chapter 8 of the online textbook. For example, this section goes into using leaflet and shiny to make interactive web apps.
 
 ## Exercises
 
@@ -372,36 +387,5 @@ Next, combine this map and the map created in the previous exercise into a singl
     - With **mapview**
     - With **leaflet**
     - Bonus: For each approach, add a legend (if not automatically provided) and a scale bar
-    
-    
-    
-1. Sketch on paper ideas for a web mapping app that could be used to make transport or land-use policies more evidence based:
-    - In the city you live, for a couple of users per day
-    - In the country you live, for dozens of users per day
-    - Worldwide for hundreds of users per day and large data serving requirements
-    
-    
-    
-1. Update the code in `coffeeApp/app.R` so that instead of centering on Brazil the user can select which country to focus on:
-    - Using `textInput()`
-    - Using `selectInput()`
-    
-    
-    
-1. Reproduce Figure \@ref(fig:tmshape) and the 1st and 6th panel of Figure \@ref(fig:break-styles) as closely as possible using the **ggplot2** package.
-
-
-
-1. Join `us_states` and `us_states_df` together and calculate a poverty rate for each state using the new dataset.
-Next, construct a continuous area cartogram based on total population. 
-Finally, create and compare two maps of the poverty rate: (1) a standard choropleth map and (2) a map using the created cartogram boundaries.
-What is the information provided by the first and the second map?
-How do they differ from each other?
-
-
-
-1. Visualize population growth in Africa. 
-Next, compare it with the maps of a hexagonal and regular grid created using the **geogrid** package.
-
 
 

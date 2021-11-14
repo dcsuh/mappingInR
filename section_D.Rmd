@@ -43,6 +43,7 @@ plot(st_geometry(seine))
 seine_simp = st_simplify(seine, dTolerance = 2000)  # 2000 m
 plot(st_geometry(seine_simp))
 ```
+
 We can also do this with polygons
 
 ```{r}
@@ -54,6 +55,7 @@ plot(st_geometry(us_states2163))
 us_states_simp1 = st_simplify(us_states2163, dTolerance = 100000)  # 100 km
 plot(st_geometry(us_states_simp1))
 ```
+
 One issue that you can see is that st_simplify() works on a per-geometry basis. In order to make the borders line up we can use ms_simplify() from 'rmapshaper'
 
 ```{r}
@@ -64,6 +66,8 @@ us_states_simp2 = rmapshaper::ms_simplify(us_states2163, keep = 0.01,
                                           keep_shapes = TRUE)
 plot(st_geometry(us_states_simp2))
 ```
+
+
 ## Centroids
 
 Centroid operations identify the center of geographic objects. Like the center of anything, there are different ways to define it (e.g. how would you define the center of your body?). One of the most common ways to define the center of geographic objects is to use the center of mass (imagine cutting out the map of Georgia from a piece of paper and balancing it on your finger). st_centroid() allows for calculation of geographic centroids.
@@ -114,17 +118,23 @@ The ‘sf’ package implements affine transformation for objects of classes ‘
 First, make an object of class ‘sfc’
 ```{r}
 nz_sfc = st_geometry(nz)
- ```
+```
+
+
 Shifting moves every point by the same distance in map units. 
+
 ```{r}
 nz_shift = nz_sfc + c(0, 100000)
- ```
+```
+
 Scaling enlarges or shrinks objects by a factor. This can be done globally or locally. If global, the relative position of the geometry features will stay the same and be scaled together. If scaling locally, then each of the geometry features will scale relative to a point that you must define (usually the centroid).
+
 ```{r}
 nz_scale <- nz_sfc*0.5
 nz_centroid_sfc = st_centroid(nz_sfc)
 nz_scale1 = (nz_sfc - nz_centroid_sfc) * 0.5 + nz_centroid_sfc
 ```
+
 Rotating requires a rotation matrix to be defined
 
 ```{r}
@@ -133,14 +143,36 @@ rotation = function(a){
   matrix(c(cos(r), sin(r), -sin(r), cos(r)), nrow = 2, ncol = 2)
 } 
 ```
+
 nz_rotate can then be used with the defined rotation matrix wrapped in the rotation function
+
 ```{r}
 nz_rotate = (nz_sfc - nz_centroid_sfc) * rotation(30) + nz_centroid_sfc
- ```
+```
+
+```{r}
+st_crs(nz_shift) = st_crs(nz_sfc)
+st_crs(nz_scale) = st_crs(nz_sfc)
+st_crs(nz_rotate) = st_crs(nz_sfc)
+p_at1 = tm_shape(nz_sfc) + tm_polygons() +
+  tm_shape(nz_shift) + tm_polygons(col = "red") +
+  tm_layout(main.title = "Shift")
+p_at2 = tm_shape(nz_sfc) + tm_polygons() +
+  tm_shape(nz_scale) + tm_polygons(col = "red") +
+  tm_layout(main.title = "Scale")
+p_at3 = tm_shape(nz_sfc) + tm_polygons() +
+  tm_shape(nz_rotate) + tm_polygons(col = "red") +
+  tm_layout(main.title = "Rotate")
+tmap_arrange(p_at1, p_at2, p_at3, ncol = 3)
+```
+
+
 Finally, the newly created geometries can replace the old ones with the st_set_geometry() function:
 ```{r}
 nz_scale_sf = st_set_geometry(nz, nz_scale)
 ```
+
+
 ## Clipping
 
 Spatial clipping is a form of spatial subsetting that only affects the geometry columns of some of the affected features. Clipping only applies to features more complex than points.
@@ -154,21 +186,23 @@ b = st_buffer(b, dist = 1) # convert points to circles
 plot(b)
 text(x = c(-0.5, 1.5), y = 1, labels = c("x", "y")) # add text
 
- ```
+```
 
 This selects the area that is shared between x and y
+
 ```{r}
 x = b[1]
 y = b[2]
 x_and_y = st_intersection(x, y)
 plot(b)
 plot(x_and_y, col = "lightgrey", add = TRUE) # color intersecting area
- ```
+```
+
 Use these other functions instead of st_intersection() to try and select other areas of the venn diagram: st_union(), st_difference(), st_sym_difference()
 
 ```{r}
 
- ```
+```
 
 ## Geometry Unions
 
@@ -243,6 +277,7 @@ plot(elev, add = TRUE) # and add the original raster
 Raster datasets can also differ with regard to their resolution. To match resolutions, one can either decrease, using aggregate(), or increase, using disagg(), the resolution of one raster.
 
 In this example, we decrease the resolution by aggregating by a factor of 5. The resulting cell uses the mean of the input cells but the function could be set to other functions such as median() or sum().
+
 ```{r}
 data(dem, package="spDataLarge")
 dem <- rast(dem)
@@ -263,9 +298,10 @@ bilinear is another method that may produce better looking results.
 dem_disagg = terra::disaggregate(dem_agg, fact = 5, method = "bilinear")
 ```
 
-However, with disaggregation we are always interpolating the values for the new cells so the outputs will always be limited by the lower resolution input. Unfortunately, we are not in a hollywood spy action thriller so there is no enhance() function.
+However, with disaggregation we are always interpolating the values for the new cells so the outputs will always be limited by the lower resolution input. Unfortunately,there is no enhance() function.
 
-insert image https://i.makeagif.com/media/12-29-2016/DhK9ZZ.gif 
+
+![zoom and enhance](https://i.makeagif.com/media/12-29-2016/DhK9ZZ.gif)
 
 ## Resampling
 
@@ -303,6 +339,11 @@ srtm_inv_masked = mask(srtm, vect(zion), inverse = TRUE)
 ```
 
 Cropping and masking are typically used so that only the area of interest is left.
+
+![](https://geocompr.robinlovelace.net/05-geometry-operations_files/figure-html/cropmask-1.png)
+
+
+
 
 ## Extraction
 
@@ -348,7 +389,8 @@ zion_transect = cbind(zion_transect, zion_elev)
 
 What this creates is an elevation map for a straight line through Zion National Park
 
-ADD EXAMPLE IMAGE
+![](https://geocompr.robinlovelace.net/05-geometry-operations_files/figure-html/lineextr-1.png) 
+
 
 
 Finally, polygons can be used for raster extractions. Polygons can return a lot of values per polygon.
@@ -391,8 +433,6 @@ ch_raster3 = rasterize(vect(cycle_hire_osm_projected), raster_template,
                        field = "capacity", fun = sum)
 ```
 
-
-ADD SECTION FOR RASTERIZATION OF LINES
 
 
 ## Spatial Vectorization
@@ -451,7 +491,8 @@ E1. Generate and plot simplified versions of the nz dataset. Experiment with dif
 
 At what value does the form of the result start to break down for each method, making New Zealand unrecognizable?
 Advanced: What is different about the geometry type of the results from st_simplify() compared with the geometry type of ms_simplify()? What problems does this create and how can this be resolved?
-E2. In the first exercise in Chapter Spatial data operations it was established that Canterbury region had 70 of the 101 highest points in New Zealand. Using st_buffer(), how many points in nz_height are within 100 km of Canterbury?
+
+E2. It was previously established that Canterbury region had 70 of the 101 highest points in New Zealand. Using st_buffer(), how many points in nz_height are within 100 km of Canterbury?
 
 E3. Find the geographic centroid of New Zealand. How far is it from the geographic centroid of Canterbury?
 
@@ -461,6 +502,7 @@ E5. Subset the point in p that is contained within x and y.
 
 Using base subsetting operators.
 Using an intermediary object created with st_intersection().
+
 E6. Calculate the length of the boundary lines of US states in meters. Which state has the longest border and which has the shortest? Hint: The st_length function computes the length of a LINESTRING or MULTILINESTRING geometry.
 
 E7. Crop the srtm raster using (1) the zion_points dataset and (2) the ch dataset. Are there any differences in the output maps? Next, mask srtm using these two datasets. Can you see any difference now? How can you explain that?
@@ -471,10 +513,12 @@ E9. Subset points higher than 3100 meters in New Zealand (the nz_height object) 
 
 Count numbers of the highest points in each grid cell.
 Find the maximum elevation in each grid cell.
+
 E10. Aggregate the raster counting high points in New Zealand (created in the previous exercise), reduce its geographic resolution by half (so cells are 6 by 6 km) and plot the result.
 
 Resample the lower resolution raster back to a resolution of 3 km. How have the results changed?
 Name two advantages and disadvantages of reducing raster resolution.
+
 E11. Polygonize the grain dataset and filter all squares representing clay.
 
 Name two advantages and disadvantages of vector data over raster data.
