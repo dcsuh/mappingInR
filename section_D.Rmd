@@ -59,6 +59,7 @@ plot(st_geometry(us_states_simp1))
 One issue that you can see is that st_simplify() works on a per-geometry basis. In order to make the borders line up we can use ms_simplify() from 'rmapshaper'
 
 ```{r}
+#install.packages("rmapshaper")
 library(rmapshaper)
 # proportion of points to retain (0-1; default 0.05)
 us_states2163$AREA = as.numeric(us_states2163$AREA)
@@ -130,9 +131,8 @@ nz_shift = nz_sfc + c(0, 100000)
 Scaling enlarges or shrinks objects by a factor. This can be done globally or locally. If global, the relative position of the geometry features will stay the same and be scaled together. If scaling locally, then each of the geometry features will scale relative to a point that you must define (usually the centroid).
 
 ```{r}
-nz_scale <- nz_sfc*0.5
 nz_centroid_sfc = st_centroid(nz_sfc)
-nz_scale1 = (nz_sfc - nz_centroid_sfc) * 0.5 + nz_centroid_sfc
+nz_scale = (nz_sfc - nz_centroid_sfc) * 0.5 + nz_centroid_sfc
 ```
 
 Rotating requires a rotation matrix to be defined
@@ -213,7 +213,8 @@ us_west = us_states[us_states$REGION == "West", ]
 us_west_union = st_union(us_west)
 ```
 
-Type transformations
+## Type transformations
+
 Geometry casting is a powerful operation that enables transformation of the geometry type. st_cast() is used for this operation and it is important to note that it will behave differently on ‘sfg’, ‘sfc’, and ‘sf’ objects. st_cast() will allow you to change between points, lines, and polygons. When changing between multi versions of these, it will take a multi-object and turn it into multiple different objects. Refer to the online textbook for more information on using st_cast and perform geometric type transformations.
 
 ## Geometric operations on raster data
@@ -230,7 +231,7 @@ We previously saw how to extract values from a raster overlaid by other spatial 
 elev = rast(system.file("raster/elev.tif", package = "spData"))
 clip = rast(xmin = 0.9, xmax = 1.8, ymin = -0.45, ymax = 0.45,
             resolution = 0.3, vals = rep(1, 9))
-elev[clip, drop = FALSE]
+crop(elev,clip)
 ```
 For the same operation we can also use the intersect() and crop() command.
  
@@ -245,6 +246,7 @@ elev = rast(system.file("raster/elev.tif", package = "spData"))
 elev_2 = extend(elev, c(1, 2)) #extended to be longer than elev
 ```
 
+Try to run this code chunk. What happens?
 ```{r}
 #elev_3 = elev + elev_2
 ```
@@ -262,7 +264,6 @@ elev_4 conveniently has a corner with coordinates (0,0)
 
 If the origin does not match then the rasters will not match. This can be fixed by using origin() again with the raster as the argument.
 
-ORIGIN ASSIGNMENT NOT WORKING FOR SOME REASON
 
 ```{r}
 # change the origin
