@@ -14,6 +14,8 @@ library(sf)
 library(terra)  
 library(tidyverse)  
 library(spData)
+
+#install.packages("spDataLarge", repos = "https://nowosad.r-universe.dev")
 library(spDataLarge)
 library(magrittr)
 
@@ -62,6 +64,8 @@ class(map_nz)
 Storing maps as map objects is useful for adding aesthetic layers and new spatial objects on top of each other. You can now add layers to 'map_nz' by simply using the + operator. If you add + tm_shape() then you can add another spatial object.
 
 ```{r}
+nz_elev = rast(system.file("raster/nz_elev.tif", package = "spDataLarge"))
+
 map_nz1 = map_nz +
   tm_shape(nz_elev) + tm_raster(alpha = 0.7)
 ```
@@ -341,8 +345,8 @@ africa = world %>%
 We will also use zion and nlcd datasets from spDataLarge:
 
 ```{r}
-zion = st_read((system.file("vector/zion.gpkg", package = "spDataLarge")))
-data(nlcd, package = "spDataLarge")
+zion = read_sf((system.file("vector/zion.gpkg", package = "spDataLarge")))
+nlcd = rast(system.file("raster/nlcd.tif", package = "spDataLarge"))
 ```
 
 1. Create a map showing the geographic distribution of the Human Development Index (`HDI`) across Africa with base **graphics** (hint: use `plot()`) and **tmap** packages (hint: use `tm_shape(africa) + ...`).
